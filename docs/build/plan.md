@@ -315,14 +315,54 @@ concurrent writers/transactional I/O rollback не поддерживаются.
 Публикация MIS и обновление соседнего snyrk по явному запросу пользователя.
 
 - [x] Уточнить требования, portable planning, plan/run/common и приёмку.
-- [ ] Проверить пакет и опубликовать MIS.
-- [ ] Обновить snyrk в native worktree, проверить, получить independent review и опубликовать.
+- [x] Проверить пакет и опубликовать MIS.
+- [x] Обновить snyrk в native worktree, проверить, получить independent review и опубликовать.
 
-**Прогресс:** `in_progress`. Технические задачи допустимы без выдуманной функции;
-инструкция демонстрации отделяет наблюдённое от непроверенного, push от deploy.
-**Проверки/коммит/блокер:** проверка и публикация ещё не выполнены.
-**Следующее:** завершить S8, не начинать новую работу.
+**Прогресс:** `completed`. Продуктовая Task по умолчанию — сквозной вертикальный
+срез; эффект и сценарий «как увидеть» сохраняются в native полях/результате и
+отчёте. Технические Task допустимы без выдуманной функции; инструкция отделяет
+наблюдённое от непроверенного, push от deploy. Новых документов/полей/runtime нет.
+**Проверки MIS:** 14 unit tests OK; S2/S3/S4 contract smokes PASS, fixtures
+`/tmp/opencode/mis-s2-ej1ilqm6`, `/tmp/opencode/mis-s3-r_gyuo9e`,
+`/tmp/opencode/mis-s4-contract-co7iyx90`. S3 registry — 13 точных skills;
+43 Markdown local links, Python AST, skill names, whitespace и неизменность
+portable S1/resources/license относительно baseline — PASS. Independent review
+`ses_e8296d933ffeMRQ7wkrQoX7ERz` — pass для полного 53-path tree
+`d0eb7bc245ada2350bae33a4371384a7d87623a1`, без required fixes. Low S8-L01/L02
+(формулировка момента записи результата и порядок пиктограмм) рассмотрены,
+отложены как необязательная косметика; L03 учтён явной границей evidence ниже.
+**Коммит MIS:** [`8632d0b`](https://github.com/atilla777/mis/commit/8632d0b8083a393e005c6475586baffa0637321b), non-force push в публичный origin/main;
+отдельный ls-remote подтвердил полный SHA, рабочая копия чистая.
+**Обновление snyrk:** native list/create/session_move, own worktree
+`/home/aleksei/.local/share/opencode/worktree/c156d6/mis-visible-results`, branch
+`chore/mis-visible-results`, base `71fc2dd3ebac92e3a7104cd8cd51a32a88a10b29`.
+Updater preflight/apply/no-op: ровно четыре skill Markdown и installation record,
+25 payload files/templates совпали с target Git blobs/modes. Authenticated registry
+подтвердил 13 точных ID/paths/bodies и четыре command ID/descriptions (templates
+не отдаются API, проверены через Git parity); реальный skill tool загрузил новый
+plan-tasks после move. Игровой код, правила, конфиг и Beads не менялись, spec no-op.
+Под Node 24.22.1 `text:verify` и полный `check` — PASS: 416 unit tests, browser
+dev/build/sample/localization 4/5/4/5, playtest dev14/build8, bundle. Первый e2e
+получил ERR_CONNECTION_REFUSED localhost:5173, причина не доказана; отдельный
+повтор и полный CI=1 rerun прошли без изменения bytes. Итоговый лог
+`/tmp/opencode/snyrk-mis-visible-results-check-final.log`.
+Independent consumer review `ses_e829280ecffe2E7kfOXZfl7urk` — pass, required fixes
+нет; полный 273-path tree `0c39d0310157e20285a027e9544b163fcf3a69b1`, без exclusions.
+**Публикация snyrk:** [`9c5b66c`](https://github.com/atilla777/snyrk/commit/9c5b66c1a54218b320c52a375b1866d6a283853a), exact reviewed tree, non-force push в origin/main;
+pre-push без bypass повторил text:verify/full check (PASS), лог
+`/tmp/opencode/snyrk-mis-visible-results-push.log`. Отдельный ls-remote подтвердил
+полный SHA. Основной snyrk после проверки чистоты обновлён ff-only; updater no-op,
+registry всех 13 skills подтверждён отдельно, основная и own копии чистые.
+**Границы:** Acceptance 11/15 проверены как контракт инструкций, package parity,
+discovery и review; нового модельного/fresh-session пилота вертикального
+планирования и отчёта не было. Contract smokes и тесты не доказывают такое
+поведение модели. Production playtest deep debug checks штатно skipped (game
+не exposed on window), за проверенные не выданы. Отдельный deploy не выполнялся.
+Эта итоговая отметка публикуется отдельным progress-only docs-коммитом.
+**Блокер:** Нет. S8 завершена; следующей согласованной реализации нет.
 
 ## Рекомендуемое следующее действие
 
-**S1–S7 завершены; S8 выполняется.** Завершить проверки и обе публикации S8.
+**S1–S8 завершены.** Новую реализацию автоматически не начинать.
+В новой сессии snyrk: «Через `/mis-plan` проверь ближайшие продуктовые задачи:
+вертикальный срез, пользовательский эффект и как увидеть результат».
