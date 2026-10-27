@@ -64,19 +64,28 @@ Sandbox не отправил issue writes автоматически. Отде�
 
 **Цель:** `mis-run` доводит одну Task до проверенного кандидата изменений в рабочей копии.
 
-- [ ] Реализовать начало `mis-flow-run`: конкретный ID или проверенная выборка, claim, native dependencies, возобновление.
-- [ ] Добавить нативный OpenCode `worktree_list/create` + `session_move` и проверку реального Git-пути; **без Worktrunk и worktree-adapter**.
-- [ ] Подключить скопированный `mis-port-op-implement-change` в standard/TDD по правилам тестового проекта.
-- [ ] Создать `mis-proj-op-sync-spec`: создать/обновить документ в `docs/spec/` для устойчивого реализованного поведения или вернуть обоснованный no-op; сохранить ссылку на Beads ID.
-- [ ] Подключить независимый `mis-port-op-review-change` с исправлением замечаний и повторной проверкой.
-- [ ] На отдельном маленьком проекте проверить: небольшая продуктовая Task с spec, техническая Task без spec, возобновление без потери изменений.
+- [x] Реализовать начало `mis-flow-run`: конкретный ID или проверенная выборка, claim, native dependencies, возобновление.
+- [x] Добавить нативный OpenCode `worktree_list/create` + `session_move` и проверку реального Git-пути; **без Worktrunk и worktree-adapter**.
+- [x] Подключить скопированный `mis-port-op-implement-change` в standard/TDD по правилам тестового проекта.
+- [x] Создать `mis-proj-op-sync-spec`: создать/обновить документ в `docs/spec/` для устойчивого реализованного поведения или вернуть обоснованный no-op; сохранить ссылку на Beads ID.
+- [x] Подключить независимый `mis-port-op-review-change` с исправлением замечаний и повторной проверкой.
+- [x] На отдельном маленьком проекте проверить: небольшая продуктовая Task с spec, техническая Task без spec, возобновление без потери изменений.
 
 **Критерий завершения:** проверенный Git-кандидат в собственной Task-worktree, согласованные тесты и документация; публикацию/закрытие пока не выдавать за сделанные.
 
-**Прогресс:** `not started`  
-**Результат и проверки:** —  
-**Коммит:** —  
-**Блокер:** —
+**Прогресс:** `in progress` (реализация и проверки готовы, ожидает публикации)  
+**Результат и проверки:** Реализован S3 `mis-flow-run`, новый `mis-proj-op-sync-spec`, условный Beads execution resource и command description. Один Task/Bug до локального кандидата; ID/ready selection, atomic claim, directed blockers, ownership/session checks, native worktree create/reuse, сохранение связи в notes, move boundary, standard/TDD из правил потребителя, spec/no-op и независимый review/repair loop. Публикация/close в runtime явно отсутствуют, S4 не реализовывалась. Portable S1 и все references/лицензия по-прежнему совпадают с pinned RIS, кроме `name`.
+
+`python -B tests/s3_execution_smoke.py` — **PASS**, OpenCode **2.0.32**, **bd 1.3.1**, embedded Dolt. Fixture `/tmp/opencode/mis-s3-gu8025s5`: native `/api/worktree` list/create и `/api/session/.../move` создали две linked Git worktree с проверенными root/common-dir/base и отдельными idle sessions; отдельный вызов native `session_move` tool и последующий API read-back также подтвердили technical location. Native default create возвращает detached HEAD; для подтверждённо новой чистой копии создана обычная Task-ветка Git, протокол отражён в flow. Product `s3-dtu`, branch `mis/s3-dtu`, worktree `/home/aleksei/.local/share/opencode/worktree/4e78a6/s3-dtu`: RED (ожидаемые assertion failures, без import errors), GREEN (3 unittest tests, включая baseline и subtests 0/-1/4, bool/float/string/None/list rejection), `docs/spec/integer-increment.md` и обновлённая навигация, Beads spec linkage. Technical `s3-33a`, branch `mis/s3-33a`, соседняя worktree: README check command, GREEN (1 baseline test), обоснованный spec no-op. Повторная проверка существующей связи и idempotent own claim не изменила notes, WIP fingerprint и число worktree; foreign untracked sentinel сохранён. Чужой claim отклонён; blocked `s3-zvh` с внешним prerequisite `s3-yhc` исключён из ready и остался без claim. Оба кандидата остаются `in_progress`, Git base/remote неизменен `6c4cb74a00124a62a2841a583fcc2d6271517287`; Dolt local `cb7rpck9o2sqc2fv1um9ugqj5kja5u63`, свежий fetch/merge-base подтвердил неизменённый remote `r0e0vjd1oee2e81vnmj9stad2o078jv8` (не опубликовано).
+
+Discovery проверил **10** MIS skills, точные локальные paths/тела и command description. Учтено наблюдавшееся асинхронное первичное обнаружение 2.0.32 (до пяти чтений, финальное строгое сравнение). Регрессия `python -B tests/s2_beads_smoke.py` — **PASS**, отдельный fixture `/tmp/opencode/mis-s2-poh_ya4p`, его тестовая S2 Dolt-публикация `dcm1blm70bhj464j2kpi8ulcuc2o86n5` не относится к S3 кандидатам.
+
+Независимый read-only reviewer (отдельный контекст `ses_e8353390bffeBd5H1ozlKx0yHa`, не автор/исправитель) вернул **pass** для пакета и обоих потребительских кандидатов; high/medium отсутствуют, исправление/re-review кода не потребовались. Reviewer самостоятельно повторил product/technical unittest (3/1 tests OK), проверил Git/native sessions/Beads read-back и совпадение candidate fingerprints: product `2f901cd794fe6563bba744638bff4a4fb10b59b838fef716175f5e9f1f6920ea`, technical `b092b59355187cb12da27c6493916aad97f3cd2f471790cafa95ab1848806dbc` (алгоритм paths/modes/bytes/deletion markers в smoke, исключён только чужой `foreign.txt`). Review пакета относительно `60300879771c10807d53552f12606a8057c26138` покрыл семь delivery-файлов, без последующих progress docs/README. Low A-L01 устранён краткой актуализацией README (не установщик S5); A-L02 учтён уточнением границ: sentinel создан **после** resume-проверки, его немедленное read-back доказывает лишь сохранность, не resume с уже существующей чужой работой. Package SHA256 `41f30c1bb9507f536817a80a02e8a068b6bccd5244772e00c353c599d3e9b8cf` (алгоритм S1); Python AST, имена/зависимости/ресурсы, Markdown file links, секреты/кэши/область публикации и whitespace проверены.
+
+**Границы проверки:** Smoke исполняет фиксированные test proposals/code/spec через реальные API/CLI, но не является fresh-model `/mis-run` e2e. Выбор и правила flow читаются как инструкции; adaptive no-ID execution, реальные конкурентные writers, recovery неизвестного create/move, сетевой remote и fresh-session пилоты не доказаны. Возобновление smoke — повторное чтение сохранённых фактов в том же процессе, не отдельная модельная сессия. Acceptance 5–7/10 покрываются ограниченно (native contract, два локальных кандидата, review отдельно); 8–9/полный цикл остаются S4–S5. Временные неуспешные fixtures не удалены и не включены в пакет.  
+После review в обеих Task guarded append/read-back сохранены проверенные fingerprints/checks и ссылка на reviewer-контекст, без close/push. Dolt local после notes — `s6tmaqcuvn7mgk8up9avb8qc53ks4b7i`; отдельный fetch/merge-base вновь подтвердил прежний remote. Reviewer отдельно проверил финальные README/progress overlays: **pass**, A-L01 resolved, A-L02 addressed; исходный runtime-кандидат не менялся.  
+**Коммит:** Проверен независимым review, ожидает commit/push.  
+**Блокер:** Нет для ограниченной реализации S3; публикация результата MIS ещё проверяется. Следующая реализационная сессия — S4, не начинать в рамках S3.
 
 ## S4 — Публикация, завершение, восстановление
 
@@ -115,4 +124,4 @@ Sandbox не отправил issue writes автоматически. Отде�
 
 ## Рекомендуемое следующее действие
 
-**S3**. Рекомендуемый запрос: «Прочитай `AGENTS.md` и `docs/build/plan.md`. Выполни S3: исполнение одной Task в native OpenCode worktree, проверки, sync-spec и независимый review. Обнови план, сделай коммит и опубликуй в `atilla777/mis` без повторного подтверждения. Не приступай к S4 и не выдавай CLI-smoke S2 за полное модельное e2e».
+**S4 после публикации S3**. Рекомендуемый запрос: «Прочитай `AGENTS.md` и `docs/build/plan.md`. Выполни S4: безопасная Git-публикация, Beads completion/publication и восстановление частичных эффектов. Проверь, обнови план, сделай коммит и опубликуй результат. Не переходи к S5; не выдавай CLI/API-smoke S2–S3 за полное модельное e2e».

@@ -3,7 +3,8 @@ name: mis-proj-op-beads
 description: >-
   Read, reconcile, create and update native Beads Epic/Task/Bug records and blocks
   in a prepared MIS project, with bounded writes and separate verified Dolt
-  publication. Not project initialization, task execution or completion.
+  publication; conditionally claim one Task/Bug and link its local candidate.
+  Not project initialization, code implementation or task completion.
 ---
 
 # Native Beads — фиксированная операция MIS
@@ -98,8 +99,13 @@ native поддержки. Stale guard/неожиданное изменение
 
 ## Публикация и граница
 
+Для выбора/claim/возобновления внутри `mis-flow-run` сначала прочитай
+[references/execution.md](references/execution.md). Это отдельная разрешённая
+область S3; запрет status/claim при **планировании** выше остаётся в силе.
+
 Публикация — отдельная операция по [references/dolt-publication.md](references/dolt-publication.md).
 Не считай локальный write/commit, Git push или exit 0 доказательством remote
 Beads. Верни `ok|blocked|conflict|error`, фактические ID/дельту, проверенные поля/
 edges, completeness/limits и отдельный receipt remote revision. Не закрывай
-записи, не выбирай следующую работу и не начинай исполнение.
+записи и не начинай реализацию кода. Выбор/claim одной работы — только по
+execution resource и явному поручению flow; не запускай следующую работу.

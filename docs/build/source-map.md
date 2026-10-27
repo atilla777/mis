@@ -84,7 +84,8 @@ Slash-фасады пакетируются в `commands/opencode/mis-plan.md`, 
 
 `mis-flow-plan`, `mis-flow-run` и `commands/opencode/mis-*.md` — новые файлы
 MIS. В S1 это обнаруживаемые точки входа с явным отказом от исполнения.
-В S2 `mis-flow-plan` реализован; `mis-flow-run` остаётся scaffold до S3–S4.
+В S2 `mis-flow-plan` реализован; в S3 `mis-flow-run` доводит работу до локального
+проверенного кандидата, но публикация/закрытие остаются вне реализации до S4.
 
 ### S2 — новые методики и фиксированный Beads
 
@@ -109,3 +110,21 @@ MIS. В S1 это обнаруживаемые точки входа с явны
 на неустановленные resources нет. `tests/s2_beads_smoke.py` — собственный
 одноразовый CLI-contract smoke на новых временных fixtures, не runtime planner,
 не установщик и не доказательство модельного e2e `/mis-plan`.
+
+### S3 — исполнение до кандидата и sync-spec
+
+Источник идей перепроверен в том же RIS SHA
+`a2a68cbe0a7c0bd5950cd448fa65f7bcc4424690`; portable implement/review и их
+references **не изменены**, включая standard/TDD и независимость reviewer.
+
+| MIS target | Точный source path / происхождение | Сохранено / обоснованное отличие |
+| --- | --- | --- |
+| `skills/mis-proj-op-sync-spec/SKILL.md` | S1 SHA / `skills/ris-proj-op-update-documentation/SKILL.md` | Bounded authorization, проверенная dedicated worktree/кандидат, authority requirements vs code, product не переписывается, justified no-op, read-back/links и pending integration. Новая узкая операция `docs/spec/` по функциональности + возврат Beads linkage; без resolver/config, published-inputs, prepare/review YAML и OKF specialist dependency. Upstream references не вызываются: все применимые правила включены в файл |
+| `skills/mis-proj-op-beads/references/execution.md` | Собственный S3 протокол по `docs/product/execution.md`; проверенный `bd 1.3.1 update/ready --help` | Exact Task/Bug, native ready/blocks, atomic `update --claim` (несовместим с guards), ownership/read-back, guarded append и связь worktree/spec; без reclaim/force/close. Основной Beads skill лишь условно подключает ресурс, planning запреты сохранены |
+| `skills/mis-flow-run/SKILL.md`, `commands/opencode/mis-run.md` | Собственная реализация по MIS execution/specifications/reliability и native OpenCode 2.0.32 API/tool contracts | Один claim/worktree/кандидат, resume из фактов без registry, session_move boundary, implement → sync-spec → independent review/repair. Native create возвращает detached HEAD: для новой чистой проверенной копии обычный Git создаёт Task-ветку; worktree создаёт только OpenCode. Явная S3 граница: нет Git/Beads publication/close |
+
+Новый sync-spec не копирует весь RIS documentation skill и его ресурсы: это
+тонкая реализация фиксированного MIS-контракта, не runtime dependency на RIS.
+`tests/s3_execution_smoke.py` — собственный disposable CLI/API contract smoke:
+две Task, native worktree/session API, реальный TDD fixture/spec и технический
+no-op/resume. Это не исполнитель скиллов и не fresh-model slash-command e2e.
