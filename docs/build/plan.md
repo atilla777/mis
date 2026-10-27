@@ -122,19 +122,42 @@ Discovery проверил **10** MIS skills, точные локальные pa
 
 **Цель:** пригодный к установке MIS без лишней инфраструктуры.
 
-- [ ] Подготовить минимальную инструкцию/скрипт установки пакета в OpenCode (только файлы MIS, `mis-plan.md`/`mis-run.md`, без RIS). Проверить реальные пути OpenCode 2.x.
-- [ ] Проверить запуск из новой OpenCode-сессии в *чистом* подготовленном проекте.
-- [ ] Пилот 1: техническая задача/веха (например, инструменты тестирования).
+- [x] Подготовить минимальную инструкцию/скрипт установки пакета в OpenCode (только файлы MIS, `mis-plan.md`/`mis-run.md`, без RIS). Проверить реальные пути OpenCode 2.x.
+- [x] Проверить запуск из новой OpenCode-сессии в *чистом* подготовленном проекте.
+- [x] Пилот 1: техническая задача/веха (например, инструменты тестирования).
 - [ ] Пилот 2: небольшая продуктовая механика с `docs/spec/` и настоящим code review.
-- [ ] Проверить отсутствие лишних runtime-соглашений, старых RIS refs, Formulas, специальных config-файлов и обязательных промежуточных документов.
+- [x] Проверить отсутствие лишних runtime-соглашений, старых RIS refs, Formulas, специальных config-файлов и обязательных промежуточных документов.
 - [ ] Сопоставить результат с [критериями MVP](acceptance.md); исправить только реальные несоответствия, зафиксировать ограничения.
 
 **Критерий завершения:** пакет устанавливается, обе команды доступны, два пилота подтверждают функциональный и технический маршрут.
 
-**Прогресс:** `not started`  
-**Результат и проверки:** —  
+**Прогресс:** `in progress`  
+**Результат и проверки:** Минимальный `scripts/install.py` и инструкция README: только 11 MIS skills/ресурсы/MIT notice и два фасада в `.opencode/{skills,commands}`, без config/init/dependencies. Идентичный повтор — no-op; конфликт и destination symlink/non-directory — отказ до копирования. `python -B -m unittest discover -s tests -p test_install.py -v` — **4 tests OK**. Подготовка `tests/s5_prepare_pilots.py` создаёт только test fixtures, не реализует planner/executor. В рекомендуемой установке package versioned, чтобы новые native worktree и новые сессии обнаруживали методы без runtime install. Документация OpenCode V2 skills/commands/API перечитана; реестр **2.0.32** на обеих новых копиях подтвердил точные paths/тела 11 skills и обе команды. Runtime skills/commands не изменены относительно S4; package SHA256 прежний **`e84307b7480770d6a2365c9ce696ff3cb6b3cab7d36090caec64773b22db3160`**. Python AST, frontmatter names, local Markdown links, whitespace — PASS; исполняемых RIS refs, config/Formulas/Worktrunk dependencies не найдено.
+
+Регрессии S2/S3/S4 — **PASS**, fixtures `/tmp/opencode/mis-s2-lx090zpx`, `/tmp/opencode/mis-s3-dokjrap2`, `/tmp/opencode/mis-s4-contract-gxgdofdi`; как прежде, это CLI/API contract smokes, не модельные workflow и не новый independent review S3-кандидатов. S4 повторно подтвердил partial recovery, confirmation-only, сохранность foreign data, non-force rejection/merge conflict и открытый Epic с неподтверждённым собственным acceptance.
+
+Новые модельные пилоты подготовлены в `/tmp/opencode/mis-s5-kpylc2jy/{technical,product}/consumer`: два разных Git/bd workspace, file/local remotes, package versioned и clean Git, пустой tracker до запуска. Корневые свежие сессии (не fork, не авторский контекст) вызвали настоящие slash-фасады через `session.command`: technical plan `ses_e833e3de7ffeFE4rPbk5qR3DA4` создал standalone `s5t-6om`, product plan `ses_e833e3c66ffezJY1BmZN6JgPdd` — standalone `s5p-kzq`; это допустимая минимизация одной небольшой работы, а не доказательство Epic-маршрута. Plan не менял Git/spec и не исполнял Task; оба отдельно подтвердили Dolt remote. Fresh product replan `ses_e833d2d36ffePG5sF7z8yNH8kU` по явному запросу создал native Epic `s5p-eaa` с own acceptance и переиспользовал прежнюю `s5p-kzq` как единственного child без дублей/blocks, Dolt S=R `e0ar3d2sa6i4vt84udk4vmb1dlnh99bs`. Модель выбрана средой автоматически (**openai/gpt-6.1-terra**), без package model override.
+
+**Технический пилот:** fresh run `ses_e833d2de2ffeHH5fN7clNXcC5G` → atomic claim/native `worktree_list/create/session_move`, worktree `/home/aleksei/.local/share/opencode/worktree/005d29/s5t-6om`, branch `mis/s5t-6om`, base `a93000aeab71a9d72ee6a13b159a92e67a7603df`. В standard mode добавлен только README с Python 3 prerequisite и точной root-командой; **1 unittest test OK**, spec обоснованно не изменён. Независимый reviewer `ses_e833c3df7ffe7YczlKo78p4qm7` сначала честно вернул **unverified** (не прочитаны все inherited package files); автор не обошёл gate, запросил завершение инспекции того же кандидата, итог **pass**, без findings, собственный повтор теста. Снимок: полное baseline tree + README mode `100644`, blob `835c80707da3ee72b045d592fbeb421fd5c56582`, exclusions отсутствуют. Commit/merge не изменил проверенный tree; Git S=R **`85908888e949e4205cf46e062f0d32cc0dc73526`**, tree **`642c6e521cb27f76d92303e7699b561ba2bbbc8a`**, точный `origin/main` в local bare remote. Result сохранён до exact Task close; отдельный Dolt S=R **`d39g8homr0s0bpgf83n842njfik89t89`**, Task closed, Epic отсутствует. Отчёт дал обе публикации/проверки/spec no-op и одну рекомендацию, новую Task не запускал. В новой session `ses_e833a5513ffe8N9Y4LXGzX05c9` из этой moved worktree запущен closed-ID recovery; до него создан foreign untracked sentinel и сохранены исходные row/HEAD/Dolt/worktree inventory для отдельного сравнения. Product run `ses_e833ac35fffeeSoIRV58x9xhAp` ещё проверяется.
+
+**Дополнительный read-back технического пилота:** из moved worktree API вернул точные локальные paths/тела всех **11** skills и обе команды; все references и MIT notice совпали побайтово с пакетом. Реальная run-сессия успешно загружала implement/sync-spec/review/publish через `skill` уже после move; отдельный `pwd/root/common-dir/branch/bd context` подтвердил новую location и прежний prepared workspace. Внешний повтор unittest — **1 test OK**, remote Git SHA/tree и closed Task подтверждены отдельно.
+
+**Fresh-session recovery:** `ses_e833a5513ffe8N9Y4LXGzX05c9`, новая корневая сессия прямо в moved worktree, успешно нашла `mis-run`/методы без наследования installed root. Closed-ID вызов подтвердил Git и Dolt, вернул no-op. Сравнение до/после: точная Beads row (включая notes/revision), Git HEAD/remote, полный worktree inventory, Dolt head и bytes заранее созданного foreign sentinel **не изменились**. Fresh Dolt fetch/merge-base отдельно подтвердил required revision. Transcript не содержит patch, review delegation, create/claim/update/close/commit/push; это настоящее fresh-session confirmation recovery, но не новый fresh-session partial-publication fault test.
+
 **Коммит:** —  
-**Блокер:** —
+**Блокер:** Проверки пилотов ещё не завершены; S5/MVP пока не объявлены готовыми.
+
+**Сопоставление с acceptance.md** (доказательства S2–S4 не заменяются заявлениями о fresh-session покрытии):
+
+| Критерии | Наблюдаемое покрытие |
+| --- | --- |
+| 1–3: требования, техническая веха, standalone | S2 native Epic/Task/reconciliation и технические критерии; S5 fresh plan для двух standalone, explicit product Epic/replan с reuse без дублей |
+| 4: native blocks | S2 цикл/external prerequisite и S3 blocked ready exclusion, повторные regression PASS; не отдельный fresh-model blocked pilot |
+| 5–7: реализация, spec, независимость | S3/S4 native worktree, TDD, spec/no-op и отдельные reviewers; S5 fresh run ещё проверяется |
+| 8–9: обе публикации, собственные критерии Epic | S4 model e2e + regression partial recovery/conflict/Epic-not-achieved; S5 ещё проверяется |
+| 10: recovery | S3 сохранение копии/notes, S4 partial и confirmation-only; S5 fresh-session closed-ID no-op с сохранностью foreign sentinel и неизменностью row/HEAD/Dolt/worktrees |
+| 11: отчёт и одно действие | S5 оба fresh plan вернули реальные ID, отдельный Dolt result и одну рекомендацию без исполнения Task; run report ещё проверяется |
+| 12 и нефункциональные ограничения | 11 skills/2 commands, package/resources/license неизменны, нет RIS/config/обязательного design/нового runtime; язык/стратегия из правил fixture, installer Python — только способ поставки |
 
 ## Рекомендуемое следующее действие
 

@@ -146,3 +146,15 @@ Portable S1 и все их resources не менялись. Это тонкая 
 smoke, не runtime publisher/исполнитель скиллов и не замена независимому review
 или модельному e2e. Отдельный модельный цикл S4 и его ограничения фиксируются
 только в плане. Новых upstream resources/scripts, нужных runtime, нет.
+
+### S5 — минимальная поставка
+
+`scripts/install.py`, `tests/test_install.py`, `tests/s5_prepare_pilots.py` и
+инструкция установки в README — собственные файлы MIS, без нового заимствования
+RIS. Установщик копирует только существующий пакет/ресурсы/MIT notice и два
+command-фасада в документированные `.opencode/{skills,commands}` OpenCode 2.x;
+не создаёт runtime config, workspace или зависимости. Подготовка пилотов —
+только test fixture, не bootstrap-команда потребителя и не исполнитель flow.
+Для обнаружения после native move рекомендуется versioned установка; сохранён
+S4 fallback чтения исходной проверенной установки при ignored package.
+Portable-методы и их ресурсы не изменяются.
