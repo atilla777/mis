@@ -174,9 +174,9 @@ Discovery проверил **10** MIS skills, точные локальные pa
 
 - [x] Добавить `mis-proj-op-show-plan` и command-фасад, обновить требования и установщик.
 - [x] Проверить установку, реестр OpenCode и native read-only граф/поддерево/блокеры.
-- [ ] Опубликовать MIS, обновить установку snyrk без потери локальных изменений.
+- [x] Опубликовать MIS, обновить установку snyrk без потери локальных изменений.
 
-**Прогресс:** `in_progress`.
+**Прогресс:** `completed` (MIS и обновление snyrk опубликованы, remote SHA проверены).
 **Результат и проверки:** Новый read-only skill/command, установщик теперь поставляет
 12 skills и 3 команды. Unit installer — **4 tests OK**; регрессии S2/S3 — **PASS**,
 fixtures `/tmp/opencode/mis-s2-8qqodbbj` и `/tmp/opencode/mis-s3-owv5hln1`.
@@ -187,8 +187,46 @@ missing ID; rows/Git HEAD+status/Dolt HEAD до и после совпали. И
 Python syntax, whitespace и portable S1 upstream parity — PASS.
 Приёмка 13 проверена инструкциями и CLI-контрактом, не fresh-model slash e2e;
 визуальное исполнение новой команды отдельной моделью не заявляется.
-**Блокер:** Публикация MIS и обновление/публикация потребителя ещё не завершены.
+**Коммит MIS:** [`f94296f`](https://github.com/atilla777/mis/commit/f94296fb397707c8820ce197995ea0f422ea012f), обычный push в `origin/main`; отдельный `git ls-remote` подтвердил полный SHA, затем рабочая копия чистая.
+**Обновление потребителя:** Все 20 файлов прежнего установленного пакета snyrk
+побайтово совпали с pinned MIS `4852166`; конфликтов/локальных правок нет.
+Native OpenCode создал отдельную worktree
+`/home/aleksei/.local/share/opencode/worktree/c156d6/mis-status-update`, собственная
+ветка `chore/mis-status-update`. Installer проверил все 22 файла обновления;
+добавлены skill/command и проектная маршрутизация статуса, revision обновлена.
+Реальный `skill` tool загрузил новый скилл из этой worktree, `/api/command`
+подтвердил три MIS команды. Полный `/api/skill` CLI-ответ с Phaser-каталогом
+обрезался: за полный consumer registry read-back не выдан; точная full-MIS
+проверка registry выполнена отдельно в S3 fixture выше.
+В snyrk `text:verify` и полный `npm run check` под Node **24.22.1** — **PASS**:
+370 unit tests, browser dev/build/sample/localization **4/5/4/5**, playtests и
+bundle check. Initial failures: отсутствовала pinned Python toolchain для шрифтов;
+локальная ignored `.venv-fonts` подготовлена по hash-pinned requirements и проверки
+повторены успешно, versioned fonts/game source не менялись. Зависимости npm для
+проверки установлены offline, без изменения package/lock.
+Consumer independent reviewer `ses_e82e6480effe7QJgT3fbj1PnxS` — **pass** для полного
+tree `e5dee0eae4a2e2722af516877b3e1780386adf1b`, base
+`e3097d951955d971a1eff72df7c5b5ccfa1d8a35`, без exclusions и high/medium.
+Сам проверил 22/20 package parity, actual skill loading и live readonly Beads
+inventory/subtree/edges. Переданные ему внутренние shell-log пути оказались
+недоступны; точный full-check receipt повторён после commit с отдельным логом
+`/tmp/opencode/snyrk-mis-status-publication-check.log`, без выдачи baseline-лога
+за проверку нового снимка. Low wording/evidence замечания рассмотрены: английская
+description нового upstream command оставлена, runtime-contract Bug не теряет;
+evidence gap закрыт повторным прогоном: `text:verify` и полный `check` — **exit 0**,
+в логе указаны точные commit/tree, versioned working copy после checks чистая. Consumer commit
+`3e4925fa5cde461270dc08bccb00e5035d0e7df1` сохраняет ровно reviewed tree.
+**Публикация потребителя:** [`3e4925f`](https://github.com/atilla777/snyrk/commit/3e4925fa5cde461270dc08bccb00e5035d0e7df1)
+отправлен non-force explicit push в `origin/main`; отдельный `git ls-remote`
+подтвердил полный SHA. Основной `/home/aleksei/plums/snyrk` fast-forward обновлён
+после проверки чистоты, без перезаписи чужой работы; обе копии чистые. В основном
+каталоге installer повторно подтвердил 22/22 идентичных файла (no-op), реальный
+`/api/command` подтвердил `/mis-status` и обе прежние команды. Beads история
+потребителя не менялась. Эта итоговая отметка публикуется отдельным docs-коммитом MIS.
+**Блокер:** Нет. Следующей согласованной реализации нет; новая сессия потребителя
+может вызвать `/mis-status` (либо `/mis-status <ID>`).
 
 ## Рекомендуемое следующее действие
 
-**S1–S5 завершены; S6 выполняется по согласованному запросу пользователя.** Завершить публикацию и обновление snyrk; не начинать следующую реализационную сессию автоматически.
+**S1–S6 завершены.** Новую реализационную сессию автоматически не начинать.
+Рекомендуемый запрос в новой сессии snyrk: «Покажи компактный статус через `/mis-status`».
