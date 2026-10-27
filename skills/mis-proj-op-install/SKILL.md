@@ -26,12 +26,17 @@ Beads — `mis-proj-op-update`. Оба режима используют оди�
   укажи конфликт; не создавай альтернативную БД ради обхода.
 - Проверь origin доверенного внешнего checkout `https://github.com/atilla777/mis`,
   fetch и зафиксируй полный target SHA. До запуска скрипта проверь его источник.
+  Подтверди достижимость target из свежего доверенного upstream ref (без аргумента
+  это origin/main); наличие только локального Git-объекта не подтверждает публикацию.
 - Проверь local `.beads/`, bd where/context/status, ambient BD_/BEADS_ overrides,
   tracked config/metadata и фактический Dolt remote. Ошибка открытия/неполная
   копия/чужой redirect не равны отсутствию. Existing database → только проверка
   и reuse; иной mode/destination/history не перенастраивай автоматически.
-- Без БД сначала проверь удалённую историю: `git ls-remote <verified-origin>
-  refs/dolt/data`. Сбой/отказ доступа — unknown и blocker, не пустой remote.
+- Без БД сначала проверь удалённую историю **проекта-потребителя**: из его root
+  выполни `git ls-remote <consumer-project-origin-URL> refs/dolt/data`, используя
+  destination проекта из первого preflight, не origin внешнего checkout MIS.
+  Origin MIS служит только источником пакета и никогда не является Beads remote.
+  Сбой/отказ доступа — unknown и blocker, не пустой remote.
   Безусловный новый init при существующем ref запрещён. Старые JSONL/backups,
   конфликтующая `.beads/` или другое хранилище требуют отдельного решения.
 
@@ -59,7 +64,8 @@ unknown resources, symlinks/hard links. Повтор того же SHA — no-op
 1. Если БД уже исправна — проверь embedded, принадлежность проекту, prefix,
    native types и remotes, сохрани их. Для подходящего workspace init не нужен.
 2. Если local БД нет, а remote `refs/dolt/data` есть: `bd bootstrap --dry-run
-   --json` должен предлагать clone **этого** Git remote, не backup/JSONL/fresh.
+   --json` должен предлагать clone **проверенного Git remote проекта-потребителя**,
+   не origin MIS, backup/JSONL/fresh.
    После проверки плана `bd --sandbox bootstrap --non-interactive`; затем
    read-back существующих ID/history и отсутствие конкурирующей новой БД.
    Несовместимость формата/capabilities блокирует, не fallback на fresh init.

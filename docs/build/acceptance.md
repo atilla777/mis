@@ -30,7 +30,7 @@ description: Сквозные приемочные сценарии вместо
 ## Нефункциональные ограничения
 
 - Содержательные части копируемых portable-методик RIS сохранены; все отклонения документированы.
-- Нет Worktrunk requirement, Beads Formulas, Feature lifecycle, bootstrap workflow или специальной системы handoff.
+- Нет Worktrunk requirement, Beads Formulas, Feature lifecycle, отдельного/скрытого bootstrap workflow или специальной системы handoff. Явная подготовка Beads входит только в `/mis-install`.
 - OpenCode runtime и `bd` version/capabilities проверены на актуальном тестовом окружении; не полагаться только на текст инструкций.
 - Git и Beads опасные операции не выполняются скрыто/с force; конфликты сохраняют полезную часть работы и сообщаются явно.
 - Не навязывать приложению язык, TDD, UI framework, CI tooling, формат тестов — руководствоваться `docs/rules/` потребителя.
