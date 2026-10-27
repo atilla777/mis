@@ -99,7 +99,7 @@ Discovery проверил **10** MIS skills, точные локальные pa
 
 **Критерий завершения:** настоящие инструменты подтверждают оба независимых канала публикации и корректную повторную попытку; конфликт не маскируется как успех.
 
-**Прогресс:** `in progress` (реализация и проверки завершены; финальный review/публикация пакета ожидаются)  
+**Прогресс:** `completed` (реализация S4 проверена независимым review и опубликована; границы проверки ниже)  
 **Результат и проверки:** Новый Git publisher, completion resource и полный run flow: whole-tree independent review, all outgoing history, merge/recheck, non-force explicit refspec, fresh remote confirmation; result-before-close exact Task/Bug, отсутствие native close CAS учтено, substantive Epic и отдельный Dolt S/R, confirmation-first recovery и один отчёт без auto-next. Источники/обоснованные отличия pinned RIS внесены в source-map; portable S1 не изменялись.
 
 `python -B tests/s4_publication_smoke.py` — **PASS**, fixture `/tmp/opencode/mis-s4-contract-9bctzvrr`: реальные Git/bd 1.3.1/embedded Dolt; synthetic Task `s4-g2k.1`, Git S `dfa15a7cf5179438cd6b0e384a20ff4463e990e1`, Dolt required `jdiue2o1s12h3dnsksqis1s1asr3ioq7`. Проверены Git-published/Task-open → close; Task-closed/Dolt-absent → failed push на отсутствующий remote (без изменения destination) → разрешённый push; confirmation-only retry без новых notes/records/commits; сохранность foreign untracked; non-force rejection и реальный merge conflict сохраняются, remote не переписан. Epic `s4-g2k` оставлен открыт при закрытом единственном child: собственный критерий external approval не подтверждён. Соседний Bug не claim/close. Это **tool-contract smoke**, не модельное исполнение скиллов и не независимый review payload.
@@ -115,8 +115,8 @@ Discovery проверил **10** MIS skills, точные локальные pa
 
 Независимое read-only review пакета `ses_e8345847bffewwUd3sjref40UQ` и focused reassessment move-изменения — **pass**, high/medium нет. Полный prospective snapshot: 44 пути, baseline `57c8fbc75767f25444f0f66b87e5ab38269d4a28`, fingerprint **`828821bc47e9e0d55dc0a7ff3e512667ec589837d416a7d362da35f958e0d79b`** (`sorted path + NUL + Git mode + NUL + bytes + NUL`, у plan predeclared baseline bytes, progress-only edits исключены из runtime approval). Reviewer сам повторил S4 smoke **PASS** в `/tmp/opencode/mis-s4-contract-tsbit7vz`; Python AST, 11 names/resources/Markdown links и whitespace — PASS. Low **S4-R01** о старой фразе «изменена только assertion» устранён: выше отражены обе правки и финальный rerun S3 PASS. Отдельная test-only свежая Git-копия `/tmp/opencode/mis-s4-git-readback-fx5vdftd/consumer` подтвердила remote candidate SHA/tree и **3 tests OK**. Portable S1/resources и MIT notice повторно побайтово сверены с pinned RIS; scope/secret patterns/cache checks и whitespace — PASS. Итоговый package SHA256 алгоритмом S1 — **`e84307b7480770d6a2365c9ce696ff3cb6b3cab7d36090caec64773b22db3160`**. Публичность `atilla777/mis`, established origin/main и отсутствие посторонних outgoing commits проверены перед публикацией.
 
-**Коммит:** реализация проверена и готова к обычной публикации; SHA и remote read-back будут внесены после push.  
-**Блокер:** Нет для ограниченного результата S4; остаётся публикация пакета. Следующая самостоятельная сессия — **S5**, не начиналась.
+**Коммит:** [`4c14bd3`](https://github.com/atilla777/mis/commit/4c14bd3d7c9646f3f61556b662018d4ec504be79) — S4 implementation/проверки, опубликован обычным non-force push в публичный `origin/main`. Отдельный `git ls-remote` подтвердил полный SHA `4c14bd3d7c9646f3f61556b662018d4ec504be79`, после push рабочая копия была чистой. Эта финальная отметка публикуется отдельным docs-коммитом.  
+**Блокер:** Нет для завершённого ограниченного результата S4. Следующая самостоятельная сессия — **S5**, не начиналась; fresh-session пилоты/MVP-приёмку не считать выполненными.
 
 ## S5 — Минимальная поставка и два пилота
 
@@ -138,4 +138,4 @@ Discovery проверил **10** MIS skills, точные локальные pa
 
 ## Рекомендуемое следующее действие
 
-После завершения публикации S4 — **S5**. Рекомендуемый запрос: «Прочитай `AGENTS.md` и `docs/build/plan.md`. Выполни S5: минимальная установка и два fresh-session пилота, включая доступность методик после native session_move. Проверь критерии MVP, обнови план, сделай коммит и опубликуй результат».
+**S5**. Рекомендуемый запрос: «Прочитай `AGENTS.md` и `docs/build/plan.md`. Выполни S5: минимальная установка и два fresh-session пилота, включая доступность методик после native session_move. Проверь критерии MVP, обнови план, сделай коммит и опубликуй результат».
