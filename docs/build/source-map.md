@@ -83,5 +83,29 @@ Slash-фасады пакетируются в `commands/opencode/mis-plan.md`, 
 | `skills/LICENSE-RIS` | S1 SHA / `LICENSE` | Точная копия MIT notice, распространяется вместе с заимствованными скиллами |
 
 `mis-flow-plan`, `mis-flow-run` и `commands/opencode/mis-*.md` — новые файлы
-MIS. В S1 это обнаруживаемые точки входа с явным отказом от исполнения, а не
-готовые workflow. Они не вызывают ещё отсутствующие операции S2–S4.
+MIS. В S1 это обнаруживаемые точки входа с явным отказом от исполнения.
+В S2 `mis-flow-plan` реализован; `mis-flow-run` остаётся scaffold до S3–S4.
+
+### S2 — новые методики и фиксированный Beads
+
+Все источники ниже прочитаны из того же SHA
+`a2a68cbe0a7c0bd5950cd448fa65f7bcc4424690` (локальный `rev-parse` перепроверен).
+Это **новые компактные методики и тонкая проектная реализация**, не изменение
+трёх побайтово сохранённых portable-операций S1. MIT notice распространяется
+вместе с пакетом. Новые файлы не вызывают upstream resources/scripts.
+
+| MIS target | Точный source path в S1 SHA | Сохранено / обоснованное отличие |
+| --- | --- | --- |
+| `skills/mis-port-op-plan-milestones/SKILL.md` | `skills/ris-port-op-plan-roadmap/SKILL.md` | Goal → bounded outcome, smallest slice, evidence/source distinction, coverage, light boundary check, necessary dependencies. Вместо roadmap → feature refinement: продуктовые **и технические** Milestone, допустим standalone без Epic; без feature graph, design authority/AC slug conventions; дальние цели без подробных Task |
+| `skills/mis-port-op-plan-tasks/SKILL.md` | `skills/ris-port-op-decompose-feature-spec/SKILL.md`, `skills/ris-port-op-plan-epic-features/SKILL.md` | One-task-first, независимый проверяемый результат, negative/numeric constraints, integrated checks, identity reconciliation all states, delta, external paths/cycles. Убраны mandatory accepted design/spec, Feature-подсистема и AC IDs; прямых достаточных требований достаточно. Read-only без файлов/трекера |
+| `skills/mis-proj-op-beads/SKILL.md` | `skills/ris-proj-adapter-beads-tasks/SKILL.md` и `references/{plan-overview,create,update,structure,concurrency}.md` в этой папке | Сохранены bd 1.3.1 CLI forms, полное all-status чтение, own fields vs brief, exact types/IDs, sandbox, fresh targeted write/read-back, native guards/limits, unknown-create reconciliation, membership vs blocks, cycle check. Новый короткий единый протокол вместо tasks-v1 adapter/config/Feature routes; cross-Epic и standalone blocks допустимы по MIS. Init, claim, close, investigation и execution не реализованы в S2 |
+| `skills/mis-proj-op-beads/references/dolt-publication.md` | `skills/ris-proj-adapter-beads-tasks/references/dolt-publication.md` | Компактная адаптация с сохранением shared-history authority, verified embedded DB/remote, confirmation-first S/L/R, reachability/no-op, clean outgoing-only push, fresh remote read-back и ambiguity recovery. Без RIS policy injection/tasks-v1; никаких новых publisher abstractions |
+
+`mis-flow-plan` и command description — собственная реализация MIS по
+`docs/product/planning.md`; не копия RIS flow. Единственный условный ресурс
+новой Beads-операции — её собственный `references/dolt-publication.md`, перенесён
+целиком в адаптированном виде. Прочие RIS references служат источником протокола,
+а не runtime-зависимостями: их нужные правила включены в основной скилл; ссылок
+на неустановленные resources нет. `tests/s2_beads_smoke.py` — собственный
+одноразовый CLI-contract smoke на новых временных fixtures, не runtime planner,
+не установщик и не доказательство модельного e2e `/mis-plan`.
