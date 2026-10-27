@@ -13,6 +13,7 @@ description: Два сквозных скилла, портативные мет
 | `/mis-plan` | `mis-flow-plan` | Согласованный достаточный граф Epic/Task в Beads |
 | `/mis-run` | `mis-flow-run` | Завершённая и проверенная работа с Git/Beads-публикацией |
 | `/mis-status` | `mis-proj-op-show-plan` | Компактное read-only дерево незавершённых работ |
+| `/mis-update` | `mis-proj-op-update` | Проверенное обновление только установленного пакета MIS |
 
 ## Атомарные методики и операции (проектный MVP)
 
@@ -26,10 +27,11 @@ description: Два сквозных скилла, портативные мет
 | `mis-proj-op-sync-spec` | Project; новый | Обновить конкретное реализованное поведение в `docs/spec/` |
 | `mis-proj-op-beads` | Project; упрощение | `ris-proj-adapter-beads-tasks`, один фиксированный `bd` |
 | `mis-proj-op-show-plan` | Project; упрощение | `ris-proj-op-show-plan`, компактное read-only дерево без Feature-модели |
+| `mis-proj-op-update` | Project; новый | Сравнение точных Git-ревизий, защита локальных правок, ограниченный update script |
 | `mis-proj-op-publish-change` | Project; упрощение | `ris-proj-op-publish-task`, безопасная Git-интеграция/проверка remote |
 | `mis-proj-lib-common` | Shared; сокращение | `ris-proj-lib-common`: контекст, диалог, одноразовые подтверждения, recovery, отчёт |
 
-Всего **12 скиллов, включая 2 сквозных** и read-only проектную операцию статуса. Дополнительные внутренние `references/` ресурсы не равны новым зарегистрированным скиллам.
+Всего **13 скиллов, включая 2 сквозных**, проектные операции статуса и обновления. Внутренние `references/` и `scripts/` ресурсы не равны новым зарегистрированным скиллам.
 
 ## Границы ответственности
 

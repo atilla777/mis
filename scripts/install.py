@@ -17,7 +17,7 @@ def install(project):
         for source in sorted(skill.rglob("*")):
             if source.is_file():
                 files.append((source, source.relative_to(PACKAGE)))
-    for name in ("mis-plan.md", "mis-run.md", "mis-status.md"):
+    for name in ("mis-plan.md", "mis-run.md", "mis-status.md", "mis-update.md"):
         files.append((PACKAGE / "commands/opencode" / name, Path("commands") / name))
     target = project / ".opencode"
     # Preflight the entire copy: no partial install on a known conflict, no

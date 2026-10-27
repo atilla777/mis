@@ -47,7 +47,7 @@ Slivka; её точная копия сохранена в `skills/LICENSE-RIS`.
 - `skills/mis-flow-plan/SKILL.md` — единый сценарий Beads-планирования.
 - `skills/mis-flow-run/SKILL.md` — одна Task/Bug от выбора до публикации, включая нативный OpenCode worktree.
 
-Slash-фасады пакетируются в `commands/opencode/mis-plan.md`, `commands/opencode/mis-run.md`, `commands/opencode/mis-status.md`. Содержат минимальную инструкцию загрузить соответствующий скилл и передать `$ARGUMENTS` без дополнительной бизнес-логики.
+Slash-фасады пакетируются в `commands/opencode/mis-plan.md`, `commands/opencode/mis-run.md`, `commands/opencode/mis-status.md`, `commands/opencode/mis-update.md`. Содержат минимальную инструкцию загрузить соответствующий скилл и передать `$ARGUMENTS` без дополнительной бизнес-логики.
 
 ## 5. Сознательно не переносить
 
@@ -173,3 +173,13 @@ navigation RIS, resolver/config и adapters; используются сущес
 и Beads read contracts. Upstream `references/feature-candidates.md` не вызывается:
 Feature-модель отсутствует. Новых runtime resources/scripts нет. Это не изменение
 перенесённых portable-методик. Command-фасад и расширение установщика — свои MIS.
+
+### S7 — безопасное обновление пакета
+
+`skills/mis-proj-op-update/SKILL.md`, полный ресурс `scripts/update.py`, command
+`mis-update.md` и `tests/test_update.py` — собственная реализация MIS, без новых
+заимствований RIS. Exact Git snapshots, baseline installation record (включая
+старую запись snyrk), полный preflight, защита local changes/symlinks/unknown
+resources, отдельный apply и no-op. Скрипт поставляется вместе со скиллом;
+внешний checkout нужен только как доверенный источник Git-объектов обеих ревизий.
+Никаких новых RIS runtime dependencies или изменений portable S1.

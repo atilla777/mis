@@ -226,7 +226,28 @@ evidence gap закрыт повторным прогоном: `text:verify` и 
 **Блокер:** Нет. Следующей согласованной реализации нет; новая сессия потребителя
 может вызвать `/mis-status` (либо `/mis-status <ID>`).
 
+## S7 — Безопасное обновление MIS и поставка в snyrk
+
+**Цель:** `/mis-update` с защитой локальных изменений, публикация MIS и обновление snyrk.
+
+- [x] Добавить скилл, полный script resource и command-фасад; обновить установщик и контракт.
+- [x] Проверить Git-snapshot preflight/apply/no-op, конфликты, удаления, unsafe paths и сторонние файлы.
+- [ ] Проверить реестр, опубликовать MIS и обновить snyrk в отдельной native worktree.
+
+**Прогресс:** `in_progress`.
+**Результат и проверки:** 13 skills/4 commands; unit suite — **14 tests OK**.
+S3 regression PASS `/tmp/opencode/mis-s3-m7de690p`: реальные native API/CLI,
+реестр 13 точных skills. S4 regression PASS `/tmp/opencode/mis-s4-contract-yp3pyezm`:
+partial recovery, confirmation-only и сохранённый конфликт. Это contract smokes,
+не fresh-model slash pilot нового update. Независимый reviewer
+`ses_e82d5027effenwiA042IhoZFcV` нашёл UPD-R01 medium: hard-linked destination
+мог изменять сторонний inode. До публикации исправлено полным preflight-отказом
+для hard links payload/record; регрессионные тесты наблюдались failing → passing.
+UPD-R02 low закрыт явным ограничением upstream mode `100644` и тестом отказа
+executable payload; Python resources запускаются через interpreter.
+**Коммит:** Пока нет.
+**Блокер:** Нет; проверки/публикация в работе. После S7 автоматически новую работу не начинать.
+
 ## Рекомендуемое следующее действие
 
-**S1–S6 завершены.** Новую реализационную сессию автоматически не начинать.
-Рекомендуемый запрос в новой сессии snyrk: «Покажи компактный статус через `/mis-status`».
+**S1–S6 завершены; S7 в работе по запросу пользователя.** Завершить S7, не начинать другую реализацию.
