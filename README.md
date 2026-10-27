@@ -2,7 +2,7 @@
 
 MIS — небольшой пакет навыков для автономного выполнения SDLC в проектах с фиксированными соглашениями: **OpenCode 2.0 + Beads + Git + OKF-документы**. Две пользовательские команды: `/mis-plan` и `/mis-run`.
 
-> **Состояние S3:** `/mis-plan` реализован для native Beads. `/mis-run` выбирает/возобновляет одну Task/Bug, делает claim и готовит проверенный локальный кандидат в собственной worktree со spec при необходимости и независимым review. **Git/Beads-публикация и закрытие работы ещё не реализованы** (S4). Проверки пока ограничены CLI/API smoke и отдельным review, не fresh-model e2e; установка и пилоты остаются S5 — см. [план](docs/build/plan.md).
+> **Состояние S4:** `/mis-plan` планирует native Beads; `/mis-run` выполняет одну Task/Bug в собственной worktree со spec по необходимости, независимым review, раздельным подтверждением Git/Beads-публикаций и recovery. Epic проверяется по собственным критериям. Проверки и их границы — в [плане](docs/build/plan.md); установка и fresh-session пилоты остаются S5.
 
 ## Начать разработку MIS
 
@@ -37,6 +37,6 @@ opencode api get '/api/skill?location%5Bdirectory%5D=/absolute/test/project'
 opencode api get '/api/command?location%5Bdirectory%5D=/absolute/test/project'
 ```
 
-Ожидаются десять `mis-*` скиллов и две команды; Beads для этой проверки не нужен.
+Ожидаются одиннадцать `mis-*` скиллов и две команды; Beads для этой проверки не нужен.
 Это проверка обнаружения, не готовности полного workflow. Методики заимствованы
 из RIS под MIT; точный SHA и отличия — в [карте переноса](docs/build/source-map.md).

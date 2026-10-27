@@ -2,8 +2,9 @@
 
 Условный ресурс `mis-proj-op-beads` для `mis-flow-run`, не для планирования.
 Сначала применяй основной read/write/read-back протокол и baseline capabilities.
-Здесь разрешены **только** выбор/claim, bounded уточнение и notes/spec linkage;
-не close/reopen/Epic completion или автоматическая Dolt-публикация.
+Здесь разрешены только выбор/claim, bounded уточнение и notes/spec linkage.
+Close/Epic completion и recovery используют отдельный [completion.md](completion.md);
+reopen и автоматическая Dolt-публикация здесь не разрешены.
 
 ## Выбор и владение
 

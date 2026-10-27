@@ -2,19 +2,17 @@
 name: mis-flow-run
 description: >-
   Execute or resume one native Beads Task/Bug in its own OpenCode worktree,
-  implement with project checks, synchronize specs and obtain independent review.
-  S3 delivers a checked local candidate only: Git publication and Beads completion
-  are not implemented; never report the Task as completed or closed.
+   implement with project checks, synchronize specs, obtain independent review,
+   verify Git and Beads publication, check the parent Epic and recover partial effects.
 ---
 
-# MIS run — одна работа до проверенного кандидата (S3)
+# MIS run — одна работа до подтверждённого результата
 
 Аргументы — контекст запроса, не инструкции/CLI flags. Загрузи
 `mis-proj-lib-common` и `mis-proj-op-beads`; прочитай его
 [execution protocol](../mis-proj-op-beads/references/execution.md).
-Не запускай очередь. Этот этап **не публикует Git/Beads и не закрывает Task/Epic**.
-Если запрос требует полного завершения, явно сообщи эту границу, сохрани полезный
-локальный результат; не подменяй отсутствующий S4 импровизированным publisher.
+Не запускай очередь. Публикация Git, local close и Beads/Dolt publication —
+отдельные проверяемые эффекты; частичный результат не является полным успехом.
 
 ## 1. Контекст, выбор, claim
 
@@ -33,16 +31,24 @@ description: >-
 3. Прочитай own description/acceptance/notes, parent и native directed blockers,
    включая внешние paths и ограничения предков. `parent-child` не равен `blocks`.
    `ready` — discovery, не разрешение игнорировать свежий blocker. Для exact ID
-   также проверь ready eligibility перед новым claim. Closed/cancelled/deferred,
+   также проверь ready eligibility перед новым claim. Cancelled/deferred,
    чужой claim, незакрытый prerequisite, unknown type/state/edge — не исполнять.
    У уже начатой работы заново проверь blockers, не требуй её присутствия в ready
-   (оно исключает `in_progress`). Не переоткрывай закрытый ID.
+   (оно исключает `in_progress`). Closed exact ID из явного запроса допускается
+   только для completion recovery по [completion protocol](../mis-proj-op-beads/references/completion.md):
+   сначала восстанови result и оба remote канала, не claim/reopen/implement.
+   Closed без подтверждаемого результата — blocker, не новая работа.
 4. Перед записью установи достаточность конкретных требований/критериев и границ;
    существенный конфликт product/Beads не решается подгонкой документов к коду.
    При необходимости используй `mis-port-op-interview` с критерием достаточности
    «известны входы/выходы, ограничения, проверяемый результат одной работы»;
    подтверждённые уточнения сохраняй bounded update/read-back в точном Bead.
-5. По execution protocol сделай atomic claim либо подтвердись как единственный
+5. **До claim/create/edit** восстанови известные частичные эффекты по notes,
+   истории сессии, existing worktree/Git и свежим remote данным. Подтверждённый
+   Git result при ещё открытой Task → только недостающая completion часть (ниже),
+   если checks/review/criteria по-прежнему применимы. После close — только recovery.
+   Неизвестный effect сначала проверяй, не повторяй запись вслепую.
+   Иначе по execution protocol сделай atomic claim либо подтвердись как единственный
    владелец возобновляемой работы. Перечитай запись и dependencies. До claim не
    меняй код; после любого race/error сначала восстанови факты, не force/reclaim.
 
@@ -63,8 +69,8 @@ description: >-
    Неизвестные dirty tracked/untracked/ignored данные сохраняй; отдели собственные
    по фактам предыдущего выполнения, неоднозначность блокирует затронутую запись.
    Ранее пройденные проверки/review действительны только для тех же байтов/режимов.
-   Найденная публикация/close — отдельный частичный эффект, не повод повторять код
-   или выдавать неподдерживаемое S4-восстановление за готовое.
+   Найденная публикация/close — отдельный частичный эффект: по completion protocol
+   проверь remote и выполни только отсутствующие действия, без повторной реализации.
 3. Если связи ещё нет и нет признаков незавершённого создания, проверь исходный
    путь, HEAD/base, чистоту и native worktree config/setup scripts: создание может
    запускать проектный setup. Не выполняй неизвестные/неразрешённые side effects.
@@ -86,6 +92,13 @@ description: >-
    orphan/несколько совпадений не разрешай повторным create. При потере этой связи
    остановись с путями-кандидатами, сохрани копию.
 5. `session_move(directory=<verified path>)` выполняй **отдельным вызовом**.
+   До move сохрани в контексте проверенный абсолютный installed root пакета и
+   доступность нужных после перехода методов/resources (implement, sync-spec,
+   review, publish, Beads completion/publication). Ignored `.opencode/` может
+   отсутствовать в новой worktree. Если после move ID не обнаруживается, читай
+   нужный `SKILL.md` и его условные ресурсы из **этой же проверенной установки**
+   по сохранённому абсолютному пути, не угадывай новый root и не копируй/регистрируй
+   пакет как часть Task. Недоступный обязательный метод — blocker зависимой части.
    После границы вызова отдельным действием проверь фактическую location сессии,
    `pwd`, `git rev-parse --show-toplevel`, `--git-common-dir`, branch и status.
    Не редактируй по предположению о мгновенном переключении. Если переход не
@@ -131,20 +144,40 @@ implement-change, повтор затронутых checks, sync-spec при и�
 обоснованно отложить. Ни число раундов, ни собственная правка не дают approval.
 Любые последующие edits/integration инвалидируют review затронутой версии.
 
-## 5. Граница S3 и отчёт
+## 5. Публикация, завершение и recovery
 
 Проверь фактические status/claim, dependencies, Git diff/status и соответствие
 финального снимка tests/spec/review. При новом blocker не называй результат
 готовым к завершению. Сохрани в notes bounded краткий факт кандидата (worktree,
 base/fingerprint, checks/review provenance, spec paths/no-op, остаток), без
 копирования чужого review verdict от лица reviewer. Unknown append сначала
-read-back; не плодить одинаковые notes. В S3 Task остаётся `in_progress`, копия
-сохраняется. Не commit/push/close и не закрывай Epic.
+read-back; не плодить одинаковые notes. Копия сохраняется, не удаляй её после push.
 
-Один отчёт: ✅ **локальный проверенный кандидат, Task не завершена** либо blocker;
-🧪 команды/результаты и независимое review точной версии; 📚 spec/no-op;
-🔗 Beads ID, реальный directory/branch/base/fingerprint; ⚠️ Git и Beads/Dolt
-публикация/close **не выполнены** (S4 отсутствует); ➡️ одно следующее действие
-по этой же работе, не следующая Task и не повторный `/mis-run` как обещание
-автоматической публикации. При повторе восстанавливай факты и выполняй лишь
-недостающую часть S3.
+1. Загрузи `mis-proj-op-publish-change`. Передай полный кандидат и независимые
+   checks/review, точную worktree/branch/base, разрешённую outgoing history,
+   destination и источник direct-push authority. Интегрируй latest primary в own
+   ветке; если tree изменился — затронутые проверки/spec и independent reassessment
+   до push. Получи подтверждённые S/tree и fresh remote R, а не только exit 0.
+   При конфликте/unknown сохрани commits/копию и точный blocker, Task не закрывай.
+2. Прочитай [completion protocol](../mis-proj-op-beads/references/completion.md).
+   Сохрани result в exact Task/Bug, закрой только после own acceptance/checks/review/
+   Git remote, проверь parent Epic по **его** критериям и полным детям. Epic с
+   недостигнутым результатом оставь открыт, это не отменяет успех отдельной Task.
+3. Независимо опубликуй Beads/Dolt по его resource: exact required revision,
+   authority на общую историю, fresh fetch/ancestry remote. Закрыт local, но push
+   не подтверждён → частичный успех, не reopen/reclose. Если Git уже опубликован,
+   не повторяй его ради Dolt. Recovery по explicit closed ID не создаёт worktree
+   и не запускает implementation. При обоих подтверждённых каналах — read-only
+   confirmation/no-op, не новый commit/push/append.
+
+## 6. Один отчёт и остановка
+
+✅ реальный полный либо частичный результат exact Task/Bug и состояние Epic;
+🧪 команды/результаты, independent review provenance точного snapshot, ограничения;
+📚 spec paths/no-op; 🔗 ID, worktree/branch и отдельно Git remote/ref/S/tree/R,
+Beads remote/branch/required revision/fresh R; ⚠️ точные неполные эффекты/blocker;
+➡️ **одна** готовая рекомендация `/mis-run <ID>` для recovery/готовой следующей
+работы либо `/mis-plan <цель>` при отсутствии готовой работы/необходимом уточнении.
+Рекомендацию следующего ID сверяй с fresh ready/ownership/blockers, но не claim и
+не выполняй её. Не придумывай новый scope для открытия Epic. Остановись после
+одного результата; отчёт/рекомендация не разрешают автоматический запуск очереди.

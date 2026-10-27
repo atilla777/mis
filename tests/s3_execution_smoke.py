@@ -186,7 +186,7 @@ for name, row in installed.items():
         PACKAGE / f"skills/{name}/SKILL.md"
     ).read_bytes()
 commands = api("get", f"/api/command?{query}")["data"]
-assert any(r["name"] == "mis-run" and "S3" in r["description"] for r in commands)
+assert any(r["name"] == "mis-run" and "Beads" in r["description"] for r in commands)
 
 product = create(
     "Implement integer increment",
@@ -294,6 +294,20 @@ for identifier in (product, technical):
     assert moved["location"]["directory"] == str(worktree)
     assert moved["projectID"] == project_id
     assert show(identifier, cwd=worktree)["assignee"] == ACTOR
+    # Native move need not copy ignored .opencode. Retain the verified installation
+    # path for on-demand method/resource reads, without runtime install/config.
+    for relative in (
+        "mis-port-op-implement-change/SKILL.md",
+        "mis-port-op-implement-change/references/tdd.md",
+        "mis-proj-op-sync-spec/SKILL.md",
+        "mis-port-op-review-change/SKILL.md",
+        "mis-proj-op-publish-change/SKILL.md",
+        "mis-proj-op-beads/references/completion.md",
+        "mis-proj-op-beads/references/dolt-publication.md",
+    ):
+        assert (PROJECT / ".opencode/skills" / relative).read_bytes() == (
+            PACKAGE / "skills" / relative
+        ).read_bytes()
 
     if identifier == product:
         (worktree / "tests/test_increment.py").write_text(

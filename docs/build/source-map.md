@@ -85,7 +85,7 @@ Slash-фасады пакетируются в `commands/opencode/mis-plan.md`, 
 `mis-flow-plan`, `mis-flow-run` и `commands/opencode/mis-*.md` — новые файлы
 MIS. В S1 это обнаруживаемые точки входа с явным отказом от исполнения.
 В S2 `mis-flow-plan` реализован; в S3 `mis-flow-run` доводит работу до локального
-проверенного кандидата, но публикация/закрытие остаются вне реализации до S4.
+проверенного кандидата; S4 добавляет публикацию/закрытие и recovery.
 
 ### S2 — новые методики и фиксированный Beads
 
@@ -128,3 +128,21 @@ references **не изменены**, включая standard/TDD и незав�
 `tests/s3_execution_smoke.py` — собственный disposable CLI/API contract smoke:
 две Task, native worktree/session API, реальный TDD fixture/spec и технический
 no-op/resume. Это не исполнитель скиллов и не fresh-model slash-command e2e.
+
+### S4 — Git publication, completion и recovery
+
+Источник publisher повторно прочитан из pinned RIS
+`a2a68cbe0a7c0bd5950cd448fa65f7bcc4424690` (проверен `git rev-parse HEAD`).
+Portable S1 и все их resources не менялись. Это тонкая проектная адаптация, не
+переписывание portable алгоритмов и не зависимость на установленный RIS.
+
+| MIS target | Точный source path / происхождение | Сохранено / обоснованное отличие |
+| --- | --- | --- |
+| `skills/mis-proj-op-publish-change/SKILL.md` | S1 SHA / `skills/ris-proj-op-publish-task/SKILL.md` | Полный publication snapshot с unchanged base/modes/exclusions, independent provenance, all outgoing history/authority, established upstream/primary, own dedicated copy, commit → merge latest primary → affected recheck/independent reassessment → explicit non-force push → fresh remote reachability, confirmation-first retry. Убраны Feature/RID/design gates, Fast exception, adapter/resolver, обязательный YAML review, pre-ID document routes и source-copy maintenance. Task/Bug одинаково используют свои native requirements; локальный primary не обновляется. Все применимые правила включены в основной файл; upstream `references/bug-subject.md` и `references/primary-sync.md` не вызываются, поскольку их специальные routes отсутствуют |
+| `skills/mis-proj-op-beads/references/completion.md` | Собственная реализация MIS execution/reliability/acceptance; фактический `bd 1.3.1 close --help`; S2 Dolt resource | Result-before-close, exact ID, read-back и native отсутствие close CAS, без force/continue/claim-next; собственные критерии Epic + complete children, отдельный Dolt S/R, recovery open-after-Git/closed-before-Dolt/confirmation-only. Без отдельного receipt/registry и автоматического reopen |
+| `skills/mis-flow-run/SKILL.md`, command, Beads main/execution resource | Собственное расширение S3 | Заменена S3 stop-boundary на publish → result/close → substantive Epic check → Dolt → один отчёт. Explicit closed-ID recovery до claim/create; нет автоматического следующего Task. Native move не переносит ignored package: сохранить installed root в контексте и при потере discovery читать методы/resources той же проверенной установки по абсолютным путям, без runtime install/config |
+
+`tests/s4_publication_smoke.py` — disposable synthetic Git/bd/Dolt fault-contract
+smoke, не runtime publisher/исполнитель скиллов и не замена независимому review
+или модельному e2e. Отдельный модельный цикл S4 и его ограничения фиксируются
+только в плане. Новых upstream resources/scripts, нужных runtime, нет.
