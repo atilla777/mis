@@ -47,7 +47,7 @@ Slivka; её точная копия сохранена в `skills/LICENSE-RIS`.
 - `skills/mis-flow-plan/SKILL.md` — единый сценарий Beads-планирования.
 - `skills/mis-flow-run/SKILL.md` — одна Task/Bug от выбора до публикации, включая нативный OpenCode worktree.
 
-Slash-фасады пакетируются в `commands/opencode/mis-plan.md`, `commands/opencode/mis-run.md`. Содержат минимальную инструкцию загрузить соответствующий скилл и передать `$ARGUMENTS` без дополнительной бизнес-логики.
+Slash-фасады пакетируются в `commands/opencode/mis-plan.md`, `commands/opencode/mis-run.md`, `commands/opencode/mis-status.md`. Содержат минимальную инструкцию загрузить соответствующий скилл и передать `$ARGUMENTS` без дополнительной бизнес-логики.
 
 ## 5. Сознательно не переносить
 
@@ -158,3 +158,18 @@ command-фасада в документированные `.opencode/{skills,co
 Для обнаружения после native move рекомендуется versioned установка; сохранён
 S4 fallback чтения исходной проверенной установки при ignored package.
 Portable-методы и их ресурсы не изменяются.
+
+### S6 — компактный read-only статус
+
+`skills/mis-proj-op-show-plan/SKILL.md` — тонкая MIS-адаптация идей
+`skills/ris-proj-op-show-plan/SKILL.md` из того же pinned RIS SHA
+`a2a68cbe0a7c0bd5950cd448fa65f7bcc4424690` (локальный HEAD перепроверен).
+Сохранены complete all-status reads, exact-ID subtree, native membership отдельно
+от directed blocks, continuous Markdown hierarchy, закрытые записи только для
+контекста/счётчиков, диагностика полноты и одна read-only рекомендация.
+По согласованному запросу убраны повторения `open`, типа Task и обычного
+приоритета; оставлены существенные исключения. В MIS нет Feature/design/acceptance
+navigation RIS, resolver/config и adapters; используются существующие MIS common
+и Beads read contracts. Upstream `references/feature-candidates.md` не вызывается:
+Feature-модель отсутствует. Новых runtime resources/scripts нет. Это не изменение
+перенесённых portable-методик. Command-фасад и расширение установщика — свои MIS.

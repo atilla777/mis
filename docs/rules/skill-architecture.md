@@ -12,6 +12,7 @@ description: Два сквозных скилла, портативные мет
 | --- | --- | --- |
 | `/mis-plan` | `mis-flow-plan` | Согласованный достаточный граф Epic/Task в Beads |
 | `/mis-run` | `mis-flow-run` | Завершённая и проверенная работа с Git/Beads-публикацией |
+| `/mis-status` | `mis-proj-op-show-plan` | Компактное read-only дерево незавершённых работ |
 
 ## Атомарные методики и операции (проектный MVP)
 
@@ -24,10 +25,11 @@ description: Два сквозных скилла, портативные мет
 | `mis-port-op-review-change` | Portable; перенос | `ris-port-op-review-change`, независимая оценка конкретного снимка |
 | `mis-proj-op-sync-spec` | Project; новый | Обновить конкретное реализованное поведение в `docs/spec/` |
 | `mis-proj-op-beads` | Project; упрощение | `ris-proj-adapter-beads-tasks`, один фиксированный `bd` |
+| `mis-proj-op-show-plan` | Project; упрощение | `ris-proj-op-show-plan`, компактное read-only дерево без Feature-модели |
 | `mis-proj-op-publish-change` | Project; упрощение | `ris-proj-op-publish-task`, безопасная Git-интеграция/проверка remote |
 | `mis-proj-lib-common` | Shared; сокращение | `ris-proj-lib-common`: контекст, диалог, одноразовые подтверждения, recovery, отчёт |
 
-Всего **11 скиллов, включая 2 сквозных**, как предварительная цель, не искусственный предел. При переносе могут понадобиться дополнительные внутренние `references/` ресурсы — они не равны новым зарегистрированным скиллам.
+Всего **12 скиллов, включая 2 сквозных** и read-only проектную операцию статуса. Дополнительные внутренние `references/` ресурсы не равны новым зарегистрированным скиллам.
 
 ## Границы ответственности
 
@@ -50,4 +52,4 @@ MIS — самостоятельный репозиторий и пакет. Н�
 
 ## Не включать в MVP
 
-Feature prepare/design/decomposition workflow RIS, Formulas, `mis-next`, `mis-init`, `mis-status`, адаптеры альтернативных трекеров, Help/Retro workflow, отдельный Run-Bug процесс, TDD-only wrapper (portable implement уже поддерживает режим).
+Feature prepare/design/decomposition workflow RIS, Formulas, `mis-next`, `mis-init`, адаптеры альтернативных трекеров, Help/Retro workflow, отдельный Run-Bug процесс, TDD-only wrapper (portable implement уже поддерживает режим).

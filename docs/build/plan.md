@@ -149,7 +149,7 @@ Discovery проверил **10** MIS skills, точные локальные pa
 Внешний read-back product: точные closed Task/Epic/sole-child перечитаны, fresh Dolt fetch/merge-base подтвердил required revision; Git delta ровно четыре implementation/test/spec файла, product/rules/package не менялись. Из **нового clone удалённой main** `/tmp/opencode/mis-s5-kpylc2jy/product/git-readback` подтверждены SHA/tree и **3 tests OK**, а не только исходная worktree. Реестр после move вернул 11 точных локальных skill paths/тел и обе команды; все ресурсы/лицензия побайтово совпали с пакетом. Исходные API transcripts и disposable fixtures сохранены локально, не включены в поставку.
 
 **Коммит:** [`d63487f`](https://github.com/atilla777/mis/commit/d63487ff748b62afdc5ce4785ca5f52311657dbe) — установщик, документация и проверки S5; опубликован обычным non-force push в публичный `origin/main`. Отдельный `git ls-remote` подтвердил полный SHA **`d63487ff748b62afdc5ce4785ca5f52311657dbe`**, после push рабочая копия была чистой. Эта итоговая отметка приёмки публикуется отдельным docs-коммитом.  
-**Блокер:** Нет для S5 и MVP в проверенной среде. Все S1–S5 завершены; следующей реализации в плане нет.
+**Блокер:** Нет для S5 и MVP в проверенной среде. Все S1–S5 завершены; последующее расширение по запросу пользователя — S6 ниже.
 
 **Сопоставление с acceptance.md** (доказательства S2–S4 не заменяются заявлениями о fresh-session покрытии):
 
@@ -167,6 +167,28 @@ Discovery проверил **10** MIS skills, точные локальные pa
 
 **Ограничения:** OpenCode **2.0.32**, bd **1.3.1**, embedded Dolt **2.4.1**, только file/local remotes в пилотах. Сетевой tracker remote, server-mode Dolt, concurrent writers, реальные network timeouts и успешный меняющий tree merge/re-review не доказаны. Fresh-session partial-publication fault recovery, adaptive interview и fresh-model blocked-task маршрут здесь не проверялись; их не подменять другими smoke cases. Ignored/untracked package по-прежнему не гарантирует discovery в новой независимой сессии после move; рекомендуемая versioned установка проверена на обоих пилотах. Установщик не проверяет готовность проекта/capabilities вместо flow, не обновляет конфликтующие файлы и не является transactional/concurrent installer. Independent reviews относятся к двум потребительским кандидатам, не к новому установщику: сам установщик проверен unit-тестами и авторским review. Test-only CLI ошибки (`dolt log -1` вместо `-n 1`, API limit 1000 вместо поддержанного 100) исправлены повторным read-back без ложного успеха или force. Неуспешная первая подготовка fixture (bd init сам создал Git-коммиты) сохранена локально; test script учитывает auto-commit. Секреты/кэши/случайные файлы не публиковались.
 
+## S6 — Компактный статус и обновление snyrk
+
+**Цель:** согласованный `/mis-status [ID]`: дерево незавершённых вех и Task/Bug,
+только чтение; публикация MIS и установка обновления в соседний snyrk.
+
+- [x] Добавить `mis-proj-op-show-plan` и command-фасад, обновить требования и установщик.
+- [x] Проверить установку, реестр OpenCode и native read-only граф/поддерево/блокеры.
+- [ ] Опубликовать MIS, обновить установку snyrk без потери локальных изменений.
+
+**Прогресс:** `in_progress`.
+**Результат и проверки:** Новый read-only skill/command, установщик теперь поставляет
+12 skills и 3 команды. Unit installer — **4 tests OK**; регрессии S2/S3 — **PASS**,
+fixtures `/tmp/opencode/mis-s2-8qqodbbj` и `/tmp/opencode/mis-s3-owv5hln1`.
+S3 API подтвердил точные paths/тела всех 12 skills в отдельной тестовой установке.
+Отдельные readonly reads S2 fixture проверили 7 all-status rows, complete children,
+exact-ID subtree, внешний directed blocker, standalone, закрытую историю и ошибку
+missing ID; rows/Git HEAD+status/Dolt HEAD до и после совпали. Имена, ресурсы,
+Python syntax, whitespace и portable S1 upstream parity — PASS.
+Приёмка 13 проверена инструкциями и CLI-контрактом, не fresh-model slash e2e;
+визуальное исполнение новой команды отдельной моделью не заявляется.
+**Блокер:** Публикация MIS и обновление/публикация потребителя ещё не завершены.
+
 ## Рекомендуемое следующее действие
 
-**S1–S5 завершены.** Новую реализационную сессию автоматически не начинать. Следующее полезное действие — применение в отдельном подготовленном проекте. Рекомендуемый запрос: «Установи MIS в подготовленный проект `<путь>` по README, проверь реестр OpenCode и выполни `/mis-plan <цель>`». Новые требования к самому MIS сначала явно согласовать, не изобретать S6.
+**S1–S5 завершены; S6 выполняется по согласованному запросу пользователя.** Завершить публикацию и обновление snyrk; не начинать следующую реализационную сессию автоматически.

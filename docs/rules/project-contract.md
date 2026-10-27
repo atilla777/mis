@@ -15,7 +15,7 @@ MIS устанавливается только в заранее подгото
 | VCS | Git, один репозиторий = один MIS-проект, известная основная ветка и публикационный remote |
 | Knowledge | `docs/product/`, `docs/spec/`, `docs/rules/`, Markdown/OKF |
 | Agent instructions | Корневой `AGENTS.md` указывает на проектные требования и правила |
-| Skills | Локально установленные скиллы **MIS** и только пользовательские команды `mis-plan`, `mis-run` |
+| Skills | Локально установленные скиллы **MIS** и пользовательские команды `mis-plan`, `mis-run`, `mis-status` |
 
 **MIS не имеет `mis.yaml`.** Нет выбора worktree adapter, tasks adapter, OKF-пути или модели lifecycle. Нет автоматического поиска альтернативного трекера или создания проекта.
 

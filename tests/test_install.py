@@ -27,13 +27,13 @@ class InstallTests(unittest.TestCase):
             self.assertEqual(
                 before, {p: p.read_bytes() for p in project.rglob("*") if p.is_file()}
             )
-            self.assertEqual(len(list(project.glob(".opencode/skills/*/SKILL.md"))), 11)
+            self.assertEqual(len(list(project.glob(".opencode/skills/*/SKILL.md"))), 12)
             self.assertEqual(unrelated.read_text(), "Keep me")
             self.assertEqual(
                 (project / ".opencode/skills/LICENSE-RIS").read_bytes(),
                 (ROOT / "skills/LICENSE-RIS").read_bytes(),
             )
-            for name in ("mis-plan", "mis-run"):
+            for name in ("mis-plan", "mis-run", "mis-status"):
                 self.assertEqual(
                     (project / f".opencode/commands/{name}.md").read_bytes(),
                     (ROOT / f"commands/opencode/{name}.md").read_bytes(),
