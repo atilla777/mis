@@ -431,10 +431,10 @@ remotes. Production deep-debug playtest штатно skipped, не выдан з
 пакета в соседнем snyrk по явному запросу пользователя.
 
 - [x] Добавить общую политику, точки plan/run и review install/update, контракт и приёмку без изменения portable S1 и моделей потребителя.
-- [ ] Проверить инструкции/пакет/профили, опубликовать MIS с remote read-back.
-- [ ] Обновить snyrk в native worktree, проверить пакет/реестр/проект, получить independent advanced-review и опубликовать.
+- [x] Проверить инструкции/пакет/профили, опубликовать MIS с remote read-back.
+- [x] Обновить snyrk в native worktree, проверить пакет/реестр/проект, получить independent advanced-review и опубликовать.
 
-**Прогресс:** `in_progress`. Согласовано в диалоге; полноценное авторство
+**Прогресс:** `completed`. Согласовано в диалоге; полноценное авторство
 `docs/product/` не входит в изменение. Один writer и один пользовательский диалог.
 **Проверки:** 16 unit tests OK; S2/S3/S4 contract smokes PASS:
 `/tmp/opencode/mis-s2-wvg8huel`, `/tmp/opencode/mis-s3-ewknw54k`,
@@ -446,14 +446,88 @@ remotes. Production deep-debug playtest штатно skipped, не выдан з
 Независимый advanced-review `ses_e8258ddf8ffe23UiVGTip7iaEX` нашёл S10-R01 medium:
 standalone install/update не подключали профиль review. Исправлено явной загрузкой
 политики и запретом fallback, без нового обязательного review там, где его не
-требует проект. Re-review/публикация пока не завершены.
-**Ограничение:** В snyrk оба профиля реально указывают на одну модель
+требует проект. Re-review — **pass**, required fixes/optional low отсутствуют;
+полный 57-path staged tree **`d02608cc23ad63573e6cbd82163d44aec6ea004f`**,
+без exclusions. Reviewer повторил 16 tests, links/names/AST/modes/bytes/secrets/
+whitespace и portable parity. Runtime snapshot сохранён при commit.
+**Исходное ограничение:** В начале обновления snyrk оба профиля указывали на одну модель
 `opencode-go/deepseek-v4.1-flash` (native agent API read-back); настройки по запросу
-сохранены. Роли разделены, разница мощности не заявляется.
-**Коммит/блокер:** публикация ещё не завершена; внешнего блокера нет.
+сохранены. На этой исходной ревизии разница мощности не заявлялась;
+последующее owner-изменение модели из remote сохранено, см. ниже.
+**Публикация MIS:** [`287df51`](https://github.com/atilla777/mis/commit/287df51e6ccee361339fe75c9119ef9141c3f441),
+обычный non-force push единственного outgoing commit в публичный origin/main.
+Отдельный ls-remote подтвердил полный SHA, после push рабочая копия была чистой.
+**Обновление snyrk:** native list/create/session_move, own worktree
+`/home/aleksei/.local/share/opencode/worktree/c156d6/mis-agent-routing`, ветка
+`chore/mis-agent-routing`, base `148c1177ae61a33efdd8e0eb86e395dec3b07a22`.
+Preflight/apply/no-op: ровно шесть package files + installation record,
+28 payload/template blobs совпали с точными Git-объектами MIS. Полный authenticated
+HTTP registry подтвердил 14 точных skill IDs/paths/bodies и пять command IDs;
+templates API не отдаёт, сверены через package parity. Внешние credentials не
+выводились. Первая проверка registry использовала неверный ключ `location`, затем
+не отделила frontmatter от body; обе assertions исправлены по реальному API/S3,
+финальные строгие сравнения PASS, неуспешные попытки за успех не выданы.
+Consumer `text:verify` и полный `check` под Node 24.22.1 / CI=1 — **PASS**:
+438 unit tests, browser dev/build/sample/localization **5/6/4/5**, playtests
+dev/game(heap)/build **16/30/8**, bundle check. Лог
+`/tmp/opencode/snyrk-mis-agent-routing-check-final.log` привязан к полному tree
+`705df205d8b6a16521f54c83ac7627c23dbde11d`. Первый прогон остановился из-за
+занятого 5173; перед повтором порт был свободен, чужие процессы не завершались,
+tracked bytes не менялись. Production deep-debug checks штатно skipped
+(game не exposed on window); они не заявлены проверенными.
+Consumer advanced-review `ses_e8253f323ffeymvoTcmcvy3bZG` — **pass** для tree
+`705df205d8b6a16521f54c83ac7627c23dbde11d`, 290 paths без exclusions;
+reviewer сам повторил 438 unit tests, 28 payload/mode parity и no-op.
+Low L1/L2/L3 рассмотрены и отложены: L1 затрагивает сохранённый portable S1,
+L2/L3 — необязательная косметика формулировок/ссылок. Наши изменения не затрагивают
+AGENTS/config/agents, игровой код, зависимости/lock и Beads; spec no-op.
+Commit `97be8ee` сохранил reviewed tree. За время review remote main продвинулась
+к `9fc695c0840fa99dfc4793ea28e468674f25cd85` с чужими правилами/CI/проверками.
+Обычный merge без конфликтов сохранил чужую работу: commit
+`b2da8eef8c829dee7789514de866d63e8b9b650a`, tree
+`58c451c6e6d34e73eb52b39d1069939434859ac0`. Delta к свежей main — только
+семь MIS paths. Интегрированные `text:verify` и полный `check` — **PASS**:
+443 unit tests, browser **5/6/4/5**, playtests **16/30/8**, bundle check,
+лог `/tmp/opencode/snyrk-mis-agent-routing-integrated-check.log` содержит
+точные commit/tree. Ограничение production deep-debug осталось прежним.
+Re-review подтвердил content pass, но R1 high остановил публикацию устаревшего
+tree: remote снова продвинулась к `598b58e6e6068c8bb91bcb3cd678b568f1fd270f`,
+owner-коммит переключил advanced на `opencode-go/glm-5.3`. Этот уже опубликованный
+выбор сохранён обычным merge, без изменения standard (`deepseek-v4.1-flash`):
+новый commit `b35989e9b812c452bbb69b5bc3c89ff155d2552a`, полный tree
+`829eb87c270f6fcd3fc81b8dd82581d7e8f817be`. Delta к свежей main снова только
+семь MIS paths. Финальный `text:verify` + полный `check` — **PASS**, лог
+`/tmp/opencode/snyrk-mis-agent-routing-final-merged-check.log` содержит точный
+commit/tree и явный `CI=true`. Финальное re-review того же независимого контекста —
+**pass** для полного tree `829eb87c270f6fcd3fc81b8dd82581d7e8f817be`, 292 paths,
+без exclusions; R1 resolved, required high/medium отсутствуют. Унаследованы
+неизменённые evidence, две новые model/AGENTS строки побайтово равны upstream.
+Перед push отдельный ls-remote подтвердил `598b58e`, reviewed tree и clean own
+worktree. Обычный explicit non-force push с hooks и CI=true — **exit 0**;
+pre-push повторил `text:verify` + полный `check` (443 unit, browser 5/6/4/5,
+playtests 16/30/8, bundle), без bypass. Лог
+`/tmp/opencode/snyrk-mis-agent-routing-push.log`.
+**Публикация snyrk:** [`b35989e`](https://github.com/atilla777/snyrk/commit/b35989e9b812c452bbb69b5bc3c89ff155d2552a),
+отдельный ls-remote подтвердил полный SHA, own worktree чистая. Основной
+`/home/aleksei/plums/snyrk` после проверки чистоты обновлён ff-only; ровно семь
+MIS paths, без перезаписи чужого. В основной копии отдельно подтверждены
+опубликованный SHA/clean status, updater no-op, 28 exact payload/template blobs,
+14 exact skill paths/bodies и пять command IDs. Native agent API подтвердил
+`standard=opencode-go/deepseek-v4.1-flash`, `advanced=opencode-go/glm-5.3`.
+Low L4 о CI env штатного hook рассмотрен и отложен как upstream/out-of-scope;
+для нашего gate и предстоящего push явно задаётся `CI=true`.
+**Границы приёмки:** Acceptance 17 подтверждён текстом политики, синтетическим
+standard-прогоном, независимыми advanced-review, реальным update/discovery и
+публикацией потребителя. Полного fresh-model plan/run пилота с автоматическим
+выбором профилей/реальным отсутствием mandatory профиля не было; это политика
+инструкций, не новый runtime enforcement. Прежние S2/S3/S4 smokes не выданы за
+такой пилот. Нет новых MIS-конфигов, агентов, моделей, portable S1 изменений
+или tracker effects; upstream model/правила сохранены, а не созданы этим update.
+**Блокер:** Нет. S10 завершена; следующей согласованной реализации нет.
+Эта итоговая отметка публикуется отдельным progress-only docs-коммитом MIS.
 
 ## Рекомендуемое следующее действие
 
-**S1–S9 завершены; S10 выполняется.** Не начинать другую реализацию автоматически.
+**S1–S10 завершены.** Не начинать другую реализацию автоматически.
 В новой сессии потребителя: «Покажи `/mis-status`». Для нового проекта — готовый
 запрос первой установки из README, не `mis-run` до подготовки проекта.
