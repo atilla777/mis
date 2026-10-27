@@ -232,9 +232,9 @@ evidence gap закрыт повторным прогоном: `text:verify` и 
 
 - [x] Добавить скилл, полный script resource и command-фасад; обновить установщик и контракт.
 - [x] Проверить Git-snapshot preflight/apply/no-op, конфликты, удаления, unsafe paths и сторонние файлы.
-- [ ] Проверить реестр, опубликовать MIS и обновить snyrk в отдельной native worktree.
+- [x] Проверить реестр, опубликовать MIS и обновить snyrk в отдельной native worktree.
 
-**Прогресс:** `in_progress`.
+**Прогресс:** `completed` (MIS и обновление snyrk опубликованы, remote SHA проверены).
 **Результат и проверки:** 13 skills/4 commands; unit suite — **14 tests OK**.
 S3 regression PASS `/tmp/opencode/mis-s3-m7de690p`: реальные native API/CLI,
 реестр 13 точных skills. S4 regression PASS `/tmp/opencode/mis-s4-contract-yp3pyezm`:
@@ -245,9 +245,70 @@ partial recovery, confirmation-only и сохранённый конфликт. 
 для hard links payload/record; регрессионные тесты наблюдались failing → passing.
 UPD-R02 low закрыт явным ограничением upstream mode `100644` и тестом отказа
 executable payload; Python resources запускаются через interpreter.
-**Коммит:** Пока нет.
-**Блокер:** Нет; проверки/публикация в работе. После S7 автоматически новую работу не начинать.
+Package re-review того же независимого контекста — **pass**, findings закрыты;
+полный 53-path snapshot без exclusions, SHA256
+`0b92d69a00d904516beabf6dd42bb523e834d0f0181ad3f275f4bba63fc74868`
+(sorted path + NUL + Git mode + NUL + bytes + NUL) совпал с index перед commit.
+Дополнительная S2 regression PASS `/tmp/opencode/mis-s2-f7ff2zxj`.
+После hard-link fix S3 regression повторно PASS `/tmp/opencode/mis-s3-tjylqo_d`,
+включая discovery финальных skill bodies; consumer-candidate reviews этого smoke
+не запускались и не подменяют отдельное review обновления snyrk.
+Python AST, Markdown links, matching frontmatter IDs, secrets/scope/whitespace
+и неизменность portable S1/resources/license относительно предыдущей поставки — PASS.
+**Коммит MIS:** [`0427956`](https://github.com/atilla777/mis/commit/0427956ab77fdc1dc272f35269a6dd5272ab5459),
+обычный non-force push в публичный `origin/main`; отдельный `git ls-remote`
+подтвердил полный SHA `0427956ab77fdc1dc272f35269a6dd5272ab5459`, после push
+рабочая копия чистая. Публичность и default branch проверены через GitHub API.
+**Обновление snyrk:** Native OpenCode list/create/session_move создали own worktree
+`/home/aleksei/.local/share/opencode/worktree/c156d6/mis-safe-update`, branch
+`chore/mis-safe-update`, base `913b62f8eee941f533db15a17f701d611a62ff16`
+(свежая remote main; основной каталог чистый, отставал на два уже опубликованных коммита).
+Preflight реального old package `f94296f` и apply изменили ровно четыре пути:
+новый skill, его полный script resource, command и installation record; 25 package
+files совпали с target Git objects, повтор — no-op. AGENTS/config/game/Phaser/grilling
+и Beads не менялись. Реальный `skill` tool загрузил новый ID из consumer worktree.
+Полный authenticated HTTP registry той же managed service подтвердил 13 точных
+MIS paths/bodies и 4 command IDs/descriptions. CLI skill output обрезался на большом
+Phaser-каталоге и не засчитан за успех; HTTP прочитан без обрезки с существующим
+service auth, credentials не выводились. Command API не отдаёт templates:
+они проверены побайтово в package parity, не выданы за API read-back.
+`npm run text:verify` и полный `npm run check` под Node **24.22.1** — **PASS**:
+416 unit tests, browser dev/build/sample/localization **4/5/4/5**, playtest dev/build
+и bundle. Receipt `/tmp/opencode/snyrk-mis-update-check.log` фиксирует base и
+candidate tree `ea23a6c0600c7a7f108d08a803605159c6e67501`. Dependencies установлены
+offline из прежнего lock; pinned Python font environment переиспользовано для
+проверок локально, затем скопировано в ignored directory, без versioned изменений.
+Обычный build-playtest warning: production debug game не выставлена в window;
+deep debug checks пропущены, не выданы за проверенные.
+Consumer independent reviewer `ses_e82cf9bd9ffeTCSJ8pSjityF9r` — **pass** для
+полного tree `ea23a6c0600c7a7f108d08a803605159c6e67501`, 273 paths, без exclusions
+и unresolved high/medium. Сам повторил 416 tests/text:verify/format/i18n/typecheck,
+проверил полный package blob/mode parity, реестр, механизм обновления/обратного
+удаления и отказ unsafe fixtures. Low-only рекомендации: косметические сообщения
+missing file/unknown SHA отложены; неизвестные отдельные mis-* directories сохраняются
+как чужие, unknown resources **внутри управляемых** папок запрещены — контракт не расширяется;
+пустые каталоги/локальные modes не нормализуются; consumer routing AGENTS сознательно
+не меняется в package maintenance. Эти замечания не меняют checked bytes и не блокируют.
+**Коммит потребителя:** [`71fc2dd`](https://github.com/atilla777/snyrk/commit/71fc2dd3ebac92e3a7104cd8cd51a32a88a10b29)
+сохранил точный reviewed tree. Единственный outgoing commit; remote primary уже
+ancestor, новой интеграции/tree change не было. Обычный explicit non-force push
+в `origin/main` выполнил pre-push hook без bypass: `text:verify` и полный `check`
+повторно **exit 0** под Node 24.22.1. Отдельный `git ls-remote` подтвердил полный SHA
+`71fc2dd3ebac92e3a7104cd8cd51a32a88a10b29`, fresh fetch/ancestry — PASS;
+own worktree чистая. Основной `/home/aleksei/plums/snyrk` после проверки чистоты
+обновлён `merge --ff-only origin/main`, HEAD/tree совпали с опубликованным результатом,
+повторный установленный updater вернул **Verified; no changes**, основная копия чистая.
+FF также подтянул два ранее опубликованных игровых коммита; это не новые изменения S7.
+Beads история потребителя не менялась, никаких tracker close/push не требовалось.
+**Границы:** Acceptance 14 подтверждён source tests + настоящим обновлением snyrk,
+независимым review и registry/publication read-back; отдельный fresh-model slash
+`/mis-update` pilot не запускался. Source authenticity/freshness проверяет caller;
+concurrent writers/transactional I/O rollback не поддерживаются. Новые зависимости
+приложению не навязаны, только Python 3/Git для maintenance script. Этот итог —
+отдельный progress-only docs-коммит после проверенных implementation публикаций.
+**Блокер:** Нет. S7 завершена; следующей согласованной реализационной сессии нет.
 
 ## Рекомендуемое следующее действие
 
-**S1–S6 завершены; S7 в работе по запросу пользователя.** Завершить S7, не начинать другую реализацию.
+**S1–S7 завершены.** Новую реализацию автоматически не начинать.
+Рекомендуемый запрос в новой сессии snyrk: «Покажи компактный статус через `/mis-status`».
