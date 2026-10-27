@@ -8,6 +8,9 @@ description: Safely update the installed MIS package from a verified upstream Gi
 Update only MIS skills/resources/license, command facades and `.opencode/mis-installation`.
 Do not update OpenCode, RIS, dependencies, project configuration, AGENTS.md or Beads.
 This is package maintenance, not a Task execution or a reason to claim/create tracker records.
+First installation and explicit Beads preparation use `mis-proj-op-install`.
+Both use this skill's package script; `--install` is only the explicit first-install
+mode and must never be an automatic fallback for missing/invalid update baselines.
 
 1. Read consumer AGENTS.md, Git status/log, existing installation record and publication rules.
    Preserve all unrelated work. Follow required native OpenCode worktree/session rules;

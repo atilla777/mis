@@ -14,6 +14,7 @@ description: Два сквозных скилла, портативные мет
 | `/mis-run` | `mis-flow-run` | Завершённая и проверенная работа с Git/Beads-публикацией |
 | `/mis-status` | `mis-proj-op-show-plan` | Компактное read-only дерево незавершённых работ |
 | `/mis-update` | `mis-proj-op-update` | Проверенное обновление только установленного пакета MIS |
+| `/mis-install` | `mis-proj-op-install` | Явная установка пакета и подготовка/восстановление embedded Beads |
 
 ## Атомарные методики и операции (проектный MVP)
 
@@ -28,10 +29,11 @@ description: Два сквозных скилла, портативные мет
 | `mis-proj-op-beads` | Project; упрощение | `ris-proj-adapter-beads-tasks`, один фиксированный `bd` |
 | `mis-proj-op-show-plan` | Project; упрощение | `ris-proj-op-show-plan`, компактное read-only дерево без Feature-модели |
 | `mis-proj-op-update` | Project; новый | Сравнение точных Git-ревизий, защита локальных правок, ограниченный update script |
+| `mis-proj-op-install` | Project; новый | Установка общим package engine и явная подготовка Beads в проектном Git remote |
 | `mis-proj-op-publish-change` | Project; упрощение | `ris-proj-op-publish-task`, безопасная Git-интеграция/проверка remote |
 | `mis-proj-lib-common` | Shared; сокращение | `ris-proj-lib-common`: контекст, диалог, одноразовые подтверждения, recovery, отчёт |
 
-Всего **13 скиллов, включая 2 сквозных**, проектные операции статуса и обновления. Внутренние `references/` и `scripts/` ресурсы не равны новым зарегистрированным скиллам.
+Всего **14 скиллов, включая 2 основных сквозных**, проектные операции статуса, установки и обновления. Установка/обновление разделены по полномочиям, но используют один package script. Внутренние `references/` и `scripts/` ресурсы не равны новым зарегистрированным скиллам.
 
 ## Границы ответственности
 
@@ -54,4 +56,4 @@ MIS — самостоятельный репозиторий и пакет. Н�
 
 ## Не включать в MVP
 
-Feature prepare/design/decomposition workflow RIS, Formulas, `mis-next`, `mis-init`, адаптеры альтернативных трекеров, Help/Retro workflow, отдельный Run-Bug процесс, TDD-only wrapper (portable implement уже поддерживает режим).
+Feature prepare/design/decomposition workflow RIS, Formulas, `mis-next`, отдельный `mis-init` вне явной установки, адаптеры альтернативных трекеров, Help/Retro workflow, отдельный Run-Bug процесс, TDD-only wrapper (portable implement уже поддерживает режим).

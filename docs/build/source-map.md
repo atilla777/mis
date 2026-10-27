@@ -47,7 +47,7 @@ Slivka; её точная копия сохранена в `skills/LICENSE-RIS`.
 - `skills/mis-flow-plan/SKILL.md` — единый сценарий Beads-планирования.
 - `skills/mis-flow-run/SKILL.md` — одна Task/Bug от выбора до публикации, включая нативный OpenCode worktree.
 
-Slash-фасады пакетируются в `commands/opencode/mis-plan.md`, `commands/opencode/mis-run.md`, `commands/opencode/mis-status.md`, `commands/opencode/mis-update.md`. Содержат минимальную инструкцию загрузить соответствующий скилл и передать `$ARGUMENTS` без дополнительной бизнес-логики.
+Slash-фасады пакетируются в `commands/opencode/mis-plan.md`, `commands/opencode/mis-run.md`, `commands/opencode/mis-status.md`, `commands/opencode/mis-install.md`, `commands/opencode/mis-update.md`. Содержат минимальную инструкцию загрузить соответствующий скилл и передать `$ARGUMENTS` без дополнительной бизнес-логики.
 
 ## 5. Сознательно не переносить
 
@@ -192,3 +192,14 @@ resources, отдельный apply и no-op. Скрипт поставляет�
 и отчёте. Это развитие новой MIS-методики S2, не изменение заимствованных S1
 implement/review/interview или TDD references. Новых upstream ресурсов,
 demo-документов, полей или runtime-зависимостей нет.
+
+### S9 — явная установка и подготовка Beads
+
+Собственные MIS `mis-proj-op-install` и `mis-install.md`, без нового заимствования
+RIS. Package engine S7 получил явный first-install режим (`--install`), а внешний
+`scripts/install.py` стал тонким фасадом того же engine: точные Git snapshots,
+единый preflight/apply, installation record. Beads подготавливается инструкцией
+skill через нативные bd init/bootstrap/config/remote с проверкой существующей
+истории, embedded mode и Git data ref; package script не управляет БД.
+Новый smoke — disposable tool-contract тест, не runtime installer/planner.
+Portable S1 и все их resources/license не менялись.

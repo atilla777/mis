@@ -1,4 +1,4 @@
-"""Preflight or apply a bounded MIS update using exact upstream Git snapshots."""
+"""Preflight or apply MIS package installation/update from exact Git snapshots."""
 
 import argparse
 from pathlib import Path, PurePosixPath
@@ -77,12 +77,14 @@ def safe_path(project, relative):
     return destination
 
 
-def update(project, source, revision, from_revision=None, apply=False):
+def update(project, source, revision, from_revision=None, apply=False, install=False):
     project = Path(project).resolve(strict=True)
     source = Path(source).resolve(strict=True)
     if not project.is_dir() or project == source:
         raise ValueError("Choose a consumer directory, not the MIS source")
     record = safe_path(project, RECORD)
+    if install and from_revision is not None:
+        raise ValueError("Installation does not accept --from-revision")
     if record.exists():
         fields = {}
         for line in record.read_text().split("\n\n", 1)[0].splitlines():
@@ -97,15 +99,17 @@ def update(project, source, revision, from_revision=None, apply=False):
         ):
             raise ValueError("Unsupported installation record/source")
         baseline = fields.get("revision", "")
+        if install and baseline != revision:
+            raise ValueError("MIS already installed at another revision; use update")
         if from_revision is not None and from_revision != baseline:
             raise ValueError("Explicit baseline disagrees with installation record")
     else:
-        if from_revision is None:
+        if from_revision is None and not install:
             raise ValueError(
                 "Missing installation record; establish --from-revision first"
             )
         baseline = from_revision
-    old = snapshot(source, baseline)
+    old = snapshot(source, baseline) if baseline is not None else {}
     new = snapshot(source, revision)
     # Check unknown files only inside owned skill directories, never other skills.
     owned = {
@@ -166,10 +170,18 @@ if __name__ == "__main__":
     parser.add_argument("--revision", required=True)
     parser.add_argument("--from-revision")
     parser.add_argument("--apply", action="store_true")
+    parser.add_argument(
+        "--install", action="store_true", help="First package install, not Beads setup"
+    )
     args = parser.parse_args()
     try:
         baseline, changes = update(
-            args.project, args.source, args.revision, args.from_revision, args.apply
+            args.project,
+            args.source,
+            args.revision,
+            args.from_revision,
+            args.apply,
+            args.install,
         )
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
         parser.exit(1, f"MIS update: {error}\n")

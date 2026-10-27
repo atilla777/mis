@@ -78,7 +78,17 @@ for kind in ("technical", "product"):
     )
     if kind == "product":
         (project / "triple.py").write_text("def triple(value):\n    return value\n")
-    run("python", "-B", str(PACKAGE / "scripts/install.py"), str(project), cwd=project)
+    revision = run("git", "rev-parse", "HEAD", cwd=PACKAGE)
+    run(
+        "python",
+        "-B",
+        str(PACKAGE / "scripts/install.py"),
+        str(project),
+        "--revision",
+        revision.strip(),
+        "--apply",
+        cwd=project,
+    )
     run("git", "add", ".", cwd=project)
     run(
         "git",
