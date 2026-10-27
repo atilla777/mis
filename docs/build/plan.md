@@ -367,12 +367,65 @@ discovery и review; нового модельного/fresh-session пилот�
 восстановление Beads в Git remote самого проекта; инструкции для ИИ в README.
 
 - [x] Добавить install skill/command, общий snapshot engine и контракт установки.
-- [ ] Проверить first install/retry/конфликты, реальный embedded init и remote restore.
-- [ ] Опубликовать MIS, обновить snyrk в own worktree с проверками/review и публикацией.
+- [x] Проверить first install/retry/конфликты, реальный embedded init и remote restore.
+- [x] Опубликовать MIS, обновить snyrk в own worktree с проверками/review и публикацией.
 
-**Прогресс:** `in_progress`. Первая версия реализации готова; проверки идут.
-**Блокер/коммит:** Публикация ещё не выполнена. Следующее — завершить S9.
+**Прогресс:** `completed`. 14 skills/5 commands; install/update разделены по
+полномочиям, package snapshot engine общий. Install явно подготавливает embedded
+Beads в `.beads/`, восстанавливает remote history вместо fresh init, использует
+`refs/dolt/data` того же Git remote проекта. README содержит готовые запросы для
+ИИ по установке/обновлению; внешний install.py — тонкий preflight/apply фасад с
+точным SHA/record, не второй установщик и не скрытый runtime bootstrap.
+**Проверки MIS:** 16 unit tests OK; final S3 regression PASS
+`/tmp/opencode/mis-s3-7pb1ebfu`, discovery 14 exact skills. S9 tool-contract PASS
+`/tmp/opencode/mis-s9-siusf8j0`: exact package install/no-op, embedded init,
+сохранность AGENTS/hooks, git+file remote того же bare origin, отдельные
+refs/dolt/data и refs/heads/main, fresh clone/bootstrap восстановил `s9-7ex`,
+required Dolt `oin29rmdp13aumk7t7c9vfuq8uomsf0f`, repeat сохранил row.
+S5 fixture preparation regression PASS `/tmp/opencode/mis-s5-qiv_pq8_`
+(не новый модельный пилот). AST/links/names/whitespace и неизменность portable
+S1/resources/license — PASS.
+**Review MIS:** `ses_e827c51dfffeabWxWrW0vmuQnh`, после исправлений R1 (явно
+consumer origin, не MIS origin, для data ref/bootstrap) и R2 (финальные registry
+bytes/new command) — pass для полного 56-path tree
+`88ad0efe8a0ef44c84932a44f42cf3d67fcab162`. Reviewer сам повторил 16 tests и
+authenticated GET: 14 exact IDs/paths/bodies, 5 command IDs/descriptions;
+27 payload/template blobs совпали с source. Low L1/L2 docs устранены; L3 про
+косметические install-mode сообщения engine рассмотрен/отложен, не gate.
+**Публикация MIS:** [`6f34ac6`](https://github.com/atilla777/mis/commit/6f34ac6537addcde457389a3d22bdd5e9ffff5b7) + safety fix [`5c6591c`](https://github.com/atilla777/mis/commit/5c6591cf71ec89efd519dbfbc8e563c1dce651e8), non-force push;
+отдельный ls-remote подтвердил полный final SHA, рабочая копия чистая.
+**Обновление snyrk:** native list/create/session_move, own worktree
+`/home/aleksei/.local/share/opencode/worktree/c156d6/mis-install-update`, branch
+`chore/mis-install-update`. Exact preflight/apply/no-op обновил только пять путей:
+install skill/command, update skill/script и record. Beads/зависимости/настройки
+не менялись, spec no-op. Source опубликован до consumer push: C1 review закрыт
+проверкой reachable SHA/no-op. Пока шло ревью, remote main продвинулся с
+`9c5b66c` до `4787096` с чужим игровым срезом. C2 устранён обычным merge без
+конфликтов и полным recheck/re-review; чужие изменения сохранены, delta к свежей
+main — только пять package paths, не игровая реализация этой сессии.
+Final consumer reviewer `ses_e827ac266ffevZ90jtGnLX40hN` — pass для полного
+289-path tree `b60657455cdc41e148623912d7e76a8523168c2e`, без exclusions.
+Под Node 24.22.1 / npm 11.19.1 / CI=1: text:verify и полный check PASS,
+438 tests, browser 5/6/4/5, playtest dev16/game30 (heap)/build8, bundle;
+точные commit/tree/env записаны в `/tmp/opencode/snyrk-mis-install-integrated-check.log`.
+**Публикация snyrk:** [`148c117`](https://github.com/atilla777/snyrk/commit/148c1177ae61a33efdd8e0eb86e395dec3b07a22), exact reviewed tree, non-force push;
+pre-push повторил полный набор без bypass, final log
+`/tmp/opencode/snyrk-mis-install-push-final.log`. Первый push был остановлен hook
+из-за чужого Vite на 5173; пользователь разрешил завершить только этот сервер,
+но процесс уже вышел сам, сигнал не отправлялся. Fresh main/свободный порт
+проверены перед повтором. Отдельный ls-remote подтвердил полный consumer SHA;
+основной каталог после проверки чистоты обновлён ff-only, updater no-op,
+14 skill paths/bodies и 5 command descriptions подтверждены отдельно в main.
+Основная и own копии чистые. Эта отметка — отдельный progress-only docs-коммит.
+**Границы:** Acceptance16 подтверждён code/unit/tool-contract, реестром и review,
+не fresh-model `/mis-install` пилотом; источниковые smokes используют local Git
+remotes. Production deep-debug playtest штатно skipped, не выдан за проверенный.
+Новых tracker records/публикации Beads snyrk не требовалось; существующая БД
+потребителя не переинициализировалась. Следующей согласованной реализации нет.
+**Блокер:** Нет. S9 завершена.
 
 ## Рекомендуемое следующее действие
 
-**S1–S8 завершены; S9 выполняется.** Завершить установку, проверки и обе публикации.
+**S1–S9 завершены.** Новую реализацию автоматически не начинать.
+В новой сессии потребителя: «Покажи `/mis-status`». Для нового проекта — готовый
+запрос первой установки из README, не `mis-run` до подготовки проекта.
