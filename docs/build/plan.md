@@ -41,18 +41,24 @@ Portable dry-runs выполнены вручную в текущем конте
 
 **Цель:** работающий `/mis-plan` от `docs/product/` до Beads Epic/Task/blocks.
 
-- [ ] Создать минимальную фиксированную `mis-proj-op-beads` из проверенных операций RIS (`bd`, native graph, update, publish, read-back).
-- [ ] Создать portable `mis-port-op-plan-milestones` и `mis-port-op-plan-tasks`, используя методики RIS лишь как источник, **без обязательного design**.
-- [ ] Реализовать flow `mis-flow-plan`: чтение требований и реального состояния; при необходимости портативное интервью; предотвращение дублей; создание/обновление Epic/Task и нативных блокирующих связей.
-- [ ] Реализовать отчет о плане и следующем `mis-run` с подтверждёнными Beads ID.
-- [ ] Проверить сценарии: техническая веха; продуктовая веха; standalone Task; повторное планирование без дублей; внешняя blocker-связь; отсутствие необходимости интервью при достаточных данных.
+- [x] Создать минимальную фиксированную `mis-proj-op-beads` из проверенных операций RIS (`bd`, native graph, update, publish, read-back).
+- [x] Создать portable `mis-port-op-plan-milestones` и `mis-port-op-plan-tasks`, используя методики RIS лишь как источник, **без обязательного design**.
+- [x] Реализовать flow `mis-flow-plan`: чтение требований и реального состояния; при необходимости портативное интервью; предотвращение дублей; создание/обновление Epic/Task и нативных блокирующих связей.
+- [x] Реализовать отчет о плане и следующем `mis-run` с подтверждёнными Beads ID.
+- [x] Проверить сценарии: техническая веха; продуктовая веха; standalone Task; повторное планирование без дублей; внешняя blocker-связь; отсутствие необходимости интервью при достаточных данных.
 
 **Критерий завершения:** `/mis-plan` действительно пишет и читает записи в тестовом Beads и не создаёт worktree/spec при планировании.
 
-**Прогресс:** `not started`  
-**Результат и проверки:** —  
-**Коммит:** —  
-**Блокер:** —
+**Прогресс:** `completed` (реализация S2 опубликована; границы проверки ниже)  
+**Результат и проверки:** Три новых скилла, рабочая инструкция `mis-flow-plan`, обновлённый command-фасад и отдельный условный publication resource. Источники/адаптации S1 SHA внесены в source-map; три portable-операции S1 и все их ресурсы по-прежнему совпадают с upstream, кроме `name`. Новые portable-методики не требуют spec/design/трекера и не пишут файлы. OpenCode **2.0.32**, тестовая установка `/tmp/opencode/mis-s2-mt5ce3zx/consumer/.opencode/`: `/api/skill` подтвердил **9** MIS ID, точные локальные пути и полные тела; `/api/command` подтвердил обе команды и новую description `mis-plan`. При первом запросе непосредственно после копирования skill list временно был пуст; повторное чтение вернуло полный набор, финальные assertions прошли без смены конфигурации.
+
+`python -B tests/s2_beads_smoke.py` — **PASS**, реальные **bd 1.3.1 / embedded Dolt / dolt 2.4.1**, fresh fixture `/tmp/opencode/mis-s2-mt5ce3zx`, отдельные локальные Git/Dolt remotes. Подготовка fixture (init/remotes/исторический close) не входит в runtime MIS. Синтетические требования полны: технический unittest entry point, integer increment с `0→1`, `-1→0`, `4→5`, отказом non-integer и запретом network/storage/UI, отдельная документационная Task. Содержание предложено в текущем авторском контексте и записано реальным CLI: technical Epic `s2-27z` / Task `s2-27z.1`, product Epic `s2-hdt` / Task `s2-hdt.1`, standalone `s2-5zp`; внешний prerequisite `s2-33s`, закрытая историческая Task `s2-827`. Проверены own description/acceptance, native parent-child и complete child selection, `s2-hdt.1 → s2-33s` через `blocks`, исключение зависимой Task из ready, отказ обратного цикла без побочных edges, bounded acceptance update с сохранением остальных полей, stale status guard exit **13** без записи. All-status reconciliation фиксированного набора повторно нашёл те же **7** ID по содержанию без новых записей и сохранил closed. Git HEAD/worktree list и все исходные файлы вне `.beads/` не изменились; `docs/spec/` остался пуст. Поля и blockers затем отдельно перечитаны в текущем контексте: у `s2-27z.1` blockers нет; продуктовая Task ожидает открытый внешний prerequisite. По достаточности заданных требований интервью не требовалось; это ручная оценка содержания, не наблюдение новой модельной сессии. Рекомендация для fixture — `/mis-run s2-27z.1`, с явным предупреждением, что сам runtime run пока scaffold.
+
+Sandbox не отправил issue writes автоматически. Отдельный non-force Dolt push и свежий fetch/merge-base подтвердили required **S = R = `6umpkpf1r53fl4o2nsa1qe0f7fgd6tps`** в `file:///tmp/opencode/mis-s2-mt5ce3zx/dolt-remote`, branch `main`; независимый test-only clone подтвердил тот же head. Повторный confirmation-only fetch установил reachability без повторной записи/push. Проверены имена, локальные Markdown-ссылки, зависимости на установленные скиллы, Python syntax, staged scope/типовые secret patterns и whitespace с разрешёнными Markdown hard breaks. Package SHA256 (`path + NUL + bytes + NUL`, как S1): `a3d7b17cb56ba97d78401cd30dd913572c4c0bfc0ab9876bfdfe5b6e251d2c8d`.
+
+**Границы проверки:** CLI smoke исполняет фиксированные proposals и проверяет native контракт, но не является автоматическим planner или полным модельным e2e вызова slash-команды в свежем контексте. Текст flow проверен в текущем авторском контексте; независимый review, реальное адаптивное интервью, concurrent writers, server-mode Dolt, сетевой tracker remote и divergence/rejection recovery не подтверждены этой проверкой. Критерии acceptance 1–4 и 11–12 покрыты ограниченно (содержание/CLI/discovery), не заявлены за полную MVP-приёмку; fresh-session пилоты и сквозной модельный цикл остаются S4–S5. `mis-run` и остальные операции S3–S4 не реализовывались.  
+**Коммит:** [`3c13d87`](https://github.com/atilla777/mis/commit/3c13d873df09397c960b050712e7615da0b79806) — S2 implementation, проверен и опубликован в `origin/main`; отдельный `git ls-remote` подтвердил полный SHA `3c13d873df09397c960b050712e7615da0b79806`, после push рабочая копия была чистой. Эта отметка прогресса публикуется отдельным docs-коммитом.  
+**Блокер:** Нет для завершённой ограниченной реализации S2. Следующая сессия — **S3**, без повторного переноса/реализации S2; полное модельное e2e не считать уже выполненным.
 
 ## S3 — Исполнение и спецификации
 
@@ -109,4 +115,4 @@ Portable dry-runs выполнены вручную в текущем конте
 
 ## Рекомендуемое следующее действие
 
-**S2**. Рекомендуемый запрос: «Прочитай `AGENTS.md` и `docs/build/plan.md`. Выполни S2 целиком, проверь результат, обнови отметку, сделай коммит и опубликуй в `atilla777/mis` без повторного подтверждения. Не приступай к S3».
+**S3**. Рекомендуемый запрос: «Прочитай `AGENTS.md` и `docs/build/plan.md`. Выполни S3: исполнение одной Task в native OpenCode worktree, проверки, sync-spec и независимый review. Обнови план, сделай коммит и опубликуй в `atilla777/mis` без повторного подтверждения. Не приступай к S4 и не выдавай CLI-smoke S2 за полное модельное e2e».
