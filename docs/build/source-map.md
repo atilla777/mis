@@ -203,3 +203,12 @@ skill через нативные bd init/bootstrap/config/remote с прове�
 истории, embedded mode и Git data ref; package script не управляет БД.
 Новый smoke — disposable tool-contract тест, не runtime installer/planner.
 Portable S1 и все их resources/license не менялись.
+
+### S10 — Профили standard/advanced и делегирование
+
+Собственная политика MIS в `mis-proj-lib-common/references/delegation.md` и
+точки вызова в common/plan/run и существующих review-маршрутах install/update.
+Используются существующие нативные OpenCode
+профили без model override, новых агентов, конфигов или runtime-кода.
+Portable S1 implement/review/interview и их ресурсы не изменены; выбор профиля
+и независимого контекста остаётся обязанностью caller, не portable-методики.

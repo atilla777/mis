@@ -112,6 +112,13 @@ description: >-
 
 ## 3. Реализация и знания
 
+По политике делегирования common ограниченную реализацию поручай `standard`
+(или выполняй в уже выбранном основном `standard`). Существенную нерешённую
+архитектуру/дизайн, рискованные контракты и сложную диагностику сначала направь
+`advanced` с ограниченным вопросом; при достаточном решении верни реализацию
+standard. Проектирование не обязательно для каждой Task. Передай точную own
+worktree и область; не редактируй её одновременно с исполнителем.
+
 Загрузи `mis-port-op-implement-change`. Передай одну Task/Bug: принятые требования,
 exclusions, актуальный код/base, точную разрешённую область, проектные constraints
 и проверки, `implementation_mode: standard|tdd` **из правил потребителя** (если
@@ -128,19 +135,19 @@ delta или обоснованный no-op; сохрани связь spec в B
 
 ## 4. Независимое review и исправления
 
-Загрузи `mis-port-op-review-change`, передай **отдельному reviewer-контексту**
+Загрузи `mis-port-op-review-change`, передай **отдельному reviewer-контексту `advanced`**
 его методику, actual diff/base и полный воспроизводимый снимок (включая новые
 файлы/spec/режимы), требования/rules и результаты checks. Этот flow явно требует
-такой делегации; reviewer не автор/исправитель, работает read-only без tracker
+такой делегации; reviewer не автор/проектировщик/исправитель, работает read-only без tracker
 writes, commit/push и сохранения отдельного review-файла. Для WIP зафиксируй
 fingerprint путей/байтов/режимов с additions/deletions; не выдавай HEAD за WIP.
 Область и исключения объяви до review; не скрывай относящиеся файлы.
 
 Получи verdict/provenance/версию, required high/medium и optional low. Self-review
-не gate. Недоступен отдельный контекст или недостаточно mandatory evidence →
+не gate. Недоступен профиль `advanced`, отдельный контекст или mandatory evidence →
 `unverified`/blocker, не checked candidate. High/medium → исправление через
 implement-change, повтор затронутых checks, sync-spec при изменении контракта и
-независимый re-review изменённого кандидата с прежними finding IDs. Low можно
+независимый `advanced` re-review изменённого кандидата с прежними finding IDs. Low можно
 обоснованно отложить. Ни число раундов, ни собственная правка не дают approval.
 Любые последующие edits/integration инвалидируют review затронутой версии.
 

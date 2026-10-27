@@ -43,7 +43,11 @@ mode and must never be an automatic fallback for missing/invalid update baseline
 6. Verify the real OpenCode registry for this consumer location: exact target MIS IDs,
    paths/bodies and command templates, not just counts or an unfiltered truncated list.
    Run relevant consumer checks. Before publication obtain independent read-only review
-   when required by the project, bound to the complete candidate tree; preserve project
+   when required by the project, bound to the complete candidate tree. Load
+   `mis-proj-lib-common` and its `references/delegation.md` for that review: use
+   a separate read-only `advanced` context, never the author/designer/fixer.
+   Missing profile/context is an `unverified` blocker, not a `general`/self-review
+   fallback. Re-review follows the same policy. Preserve project
    authorization boundaries. Commit only the requested update and publish non-force
    only when authorized, then independently verify the remote SHA/reachability and status.
 7. Report old → new SHA, changed files, checks, Git publication separately, limitations

@@ -104,7 +104,11 @@ ignored файлы и не коммить всю `.opencode/` без прове�
 
 Проверь точные skill IDs/paths/bodies и command templates в реальном OpenCode,
 package no-op, bd context/status, существующие ID и remote history. Применимые
-проектные проверки/review до Git-публикации обязательны. Git и Dolt — отдельные
+проектные проверки/review до Git-публикации обязательны. Для требуемого review
+загрузи `mis-proj-lib-common` и его `references/delegation.md`: только отдельный
+read-only контекст `advanced`, не автор/проектировщик/исправитель. Недоступен
+профиль/контекст — `unverified`/blocker без замены на general/self-review;
+re-review следует той же политике. Git и Dolt — отдельные
 эффекты даже при одном GitHub repository. Для Dolt загрузи `mis-proj-op-beads`
 и его `references/dolt-publication.md`: authority на shared history,
 non-force push и fresh remote confirmation; приоритет не обходит ограничения.

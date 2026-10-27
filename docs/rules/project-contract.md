@@ -17,6 +17,7 @@ description: Предопределённая структура и инстру
 | VCS | Git, один репозиторий = один MIS-проект, известная основная ветка и публикационный remote |
 | Knowledge | `docs/product/`, `docs/spec/`, `docs/rules/`, Markdown/OKF |
 | Agent instructions | Корневой `AGENTS.md` указывает на проектные требования и правила |
+| Agent profiles | Доступные для делегирования `standard` и `advanced`; конкретные модели/варианты и разрешения задаёт пользователь в нативной конфигурации OpenCode |
 | Skills | Локально установленные скиллы **MIS** и команды `mis-plan`, `mis-run`, `mis-status`, `mis-install`, `mis-update` |
 
 **MIS не имеет `mis.yaml`.** Нет выбора worktree adapter, tasks adapter, OKF-пути или модели lifecycle. Нет автоматического поиска альтернативного трекера или создания приложения. Настройки Beads остаются нативными: `.beads/`, embedded Dolt, remote того же Git-репозитория и `refs/dolt/data`; живая БД не коммитится в primary branch. Существующий иной workspace установщик не мигрирует без отдельного решения.
