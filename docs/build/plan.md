@@ -797,12 +797,48 @@ startup timeout. Первый full gate обнаружил throw при static i
 unit tests; проверка наличия URL перенесена в Playwright globalSetup.
 Первое independent review `ses_e7d2fdb11ffe6QxV8zCEooSwCr` потребовало исправить
 static import, Vite7 compatibility и потерю --timeout; исправления внесены,
-late-start cleanup покрыт тестом. Полный финальный gate и re-review ожидаются.
+late-start cleanup покрыт тестом. Финальный `text:verify && CI=true npm run check`
+под Node24.22.1 — PASS: 533 unit tests, 11 skipped, три новые isolation tests,
+браузерные dev/build/sample/localization и все playtest-наборы, финальный bundle.
+Receipt `/tmp/opencode/snyrk-isolated-servers-check-final.log`; production deep
+debug checks штатно skipped с warning, не выданы за выполненные. Independent
+re-review того же отдельного `advanced` — **pass**, R1/R3/R4 закрыты, optional
+R2 покрыт lifecycle-тестами. Все четыре полных снимка одобрены без exclusions.
+После поиска оставшихся инструкций исправлены три устаревших URL/команды в
+Snyrk `docs/rules/text-pipeline.md`; отдельное bounded review — **pass**, runtime
+bytes неизменны. Архив `docs/specs/` не переписывался.
 
-**Прогресс:** `in_progress`; Git-публикация пока не выполнена. Публикация
-соседних PAIT/Yambrix этим запросом явно не разрешалась; локальные результаты
-сохраняются отдельно. Новая игровая задача, deploy и смена приватности не входят
-в работу. Следующая реализация MIS не назначена.
+Дополнительно опубликованный immutable пакет MIS `3b3b066` установлен в
+`/tmp/opencode/mis-isolation-install-i8ehr1p0`: preflight/apply/no-op PASS,
+common/run побайтово совпали с Git snapshot, Beads не создавался. Попытка полного
+registry read-back через CLI дала сначала пустой список, затем обрезанный UTF-8
+вывод; за подтверждение discovery не засчитана. Это не fresh-model pilot.
+
+**Публикация:** пользователь затем явно поручил завершить и опубликовать все
+четыре результата. Обычные non-force push и отдельные `ls-remote` подтвердили:
+
+- MIS: `3b3b066644e1fa1e88e39e4c2537bd507eff3a17`, tree
+  `613c534708ce8a8aeae057527bf42a7b428efec7`;
+- PAIT: `18e8232c214972d706d7591a15ca6b5f44a35177`, tree
+  `95bcfd7977e5fa8ab00a77a4f3ffe1b81f207553`;
+- Yambrix: `82a722e36c17bdd88c5fcd1e873eeb63184afa3a`, tree
+  `e87e3d8e8625fc72e34473f24516262b1636c300`; GitHub Actions — success;
+- Snyrk implementation `24ed7312aef1d725a608e0b6ebdd6d8499dda678`, tree
+  `43ea9fbc79e2a8c8bdf85c7a3b22ae79d563147a`, затем docs
+  `49bccb5670e7bc065c5ebdc4eb84c49d24041581`, финальный tree
+  `da8c2a3b54af614726d0d2ca97cb074a174c74d6`.
+
+Оба Snyrk push без обхода hook повторили `text:verify && check` — PASS, receipts
+`/tmp/opencode/snyrk-isolated-servers-push.log` и
+`/tmp/opencode/snyrk-isolated-servers-docs-push.log`. Свежий fetch подтвердил
+Snyrk remote, основная чистая копия обновлена ff-only до финального SHA/tree;
+чужие существующие worktree не менялись. Им потребуется обычное включение этих
+изменений перед использованием новых команд, без перезаписи текущей работы.
+
+**Прогресс:** `completed`; блокеров нет. Эта итоговая отметка — отдельный
+progress-only docs-коммит MIS. Установленные MIS-пакеты игр и их Beads не менялись;
+новая игровая задача, deploy и смена приватности не выполнялись. Следующая
+реализация MIS не назначена.
 
 **S1–S11 завершены.** Не начинать другую реализацию автоматически.
 В новой сессии потребителя: «Покажи `/mis-status`». Для нового проекта — готовый
