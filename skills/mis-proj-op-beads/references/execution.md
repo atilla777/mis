@@ -23,6 +23,17 @@ reopen и автоматическая Dolt-публикация здесь не
   активный writer/session/worktree. Чужой assignment, pool alias без отдельного
   разрешения, закрытый/blocked/deferred/unknown state — остановка, не reclaim/force.
 
+## Уточнения до claim и при resume
+
+После проверки eligibility, владения и blockers flow может сохранить подтверждённые
+ответы внутри прежнего scope ещё до claim. Используй основной bounded update
+протокол: свежие description/acceptance, status/assignee и edges, guards по
+прочитанному состоянию, только затронутые поля, затем read-back с проверкой
+сохранности остальных. Для своей `in_progress` Task — те же проверки единственного
+writer. Не меняй статус/assignee, scope или граф ради уточнения; не записывай
+предложения как принятые ответы. Stale/unknown → reconciliation. Это не разрешение
+редактировать чужую или заблокированную работу и не замена claim перед кодом.
+
 ## Atomic claim
 
 После свежей проверки unassigned open или assigned-to-self open и eligibility:

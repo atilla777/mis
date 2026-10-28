@@ -648,6 +648,38 @@ game/AGENTS/config/dependencies/Beads и без deploy/смены приватн
 `docs: configure project-local worktrees during MIS setup`.
 Следующая реализация не назначена; блокеров содержания нет.
 
+### Маршрутизация plan/run (2026-10-28)
+
+По ограниченному запросу пользователя уточнены канонические flow plan/run,
+read-only рекомендация status и Beads execution resource: определённая Task без
+реальных blockers допускает run с исследованием/limited interview; до claim
+нужны достаточные требования, принятые ответы сохраняются в той же записи.
+Plan нужен для выделения/изменения объёма, декомпозиции и графа, не для каждого
+ответа. Prerequisites, владение, конфликты и среда не обходятся интервью.
+Продуктовые требования и пять содержательных сценариев согласованы; command-фасады
+проверены и остаются без бизнес-логики. Portable S1 не менялись.
+**Прогресс:** исправление проверено; публикация фиксируется ниже после read-back.
+**Проверки:** 16 unit tests OK; S2/S3/S4 contract smokes PASS, fixtures
+`/tmp/opencode/mis-s2-mj1d8klq`, `/tmp/opencode/mis-s3-dxd12koo`,
+`/tmp/opencode/mis-s4-contract-7nocz4p2`. S3 registry подтвердил 14 skills и
+неисполнение blocked Task; S4 — recovery и сохранение конфликтов. AST, whitespace
+и побайтовая неизменность portable S1/resources/license относительно HEAD — PASS.
+**Независимое review:** отдельный read-only `advanced`
+`ses_e7d861fd0ffeuCfUxFh43ZbNcf` — **pass**, required high/medium и optional low
+пусты. Проверены пять сценариев и полный 58-path prospective tree без exclusions,
+baseline `14f5c6ac2b48255cb5e6d033c8a47a1300a9e353`, fingerprint SHA256
+`5b569be5725466a7e282b9caf3a4fe5bc40b290a6210f0b5012f6a1bedd8a574`
+(`sorted path + NUL + Git mode + NUL + WIP bytes + NUL`). Координатор повторно
+подтвердил fingerprint до этой progress-only правки. Reviewer независимо сверил
+28 package-файлов с S3 fixture; payload-кандидаты smoke не входят в review и не
+публикуются. Текущая отметка плана не меняет проверенный runtime-кандидат.
+**Границы:** пять сценариев проверены содержательно автором и reviewer;
+текстовые проверки и tool-contract smokes не доказывают поведение агента при новом
+интервью. Новый fresh-model plan/run pilot не запускался. Потребительские проекты
+и их трекеры не менялись. Блокеров нет; новая реализация не назначена.
+**Коммит:** с сообщением `fix: route bounded task clarification through mis-run`;
+SHA и remote read-back будут внесены отдельной progress-only отметкой.
+
 **S1–S11 завершены.** Не начинать другую реализацию автоматически.
 В новой сессии потребителя: «Покажи `/mis-status`». Для нового проекта — готовый
 запрос первой установки из README, не `mis-run` до подготовки проекта.
