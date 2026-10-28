@@ -658,7 +658,7 @@ Plan нужен для выделения/изменения объёма, де�
 ответа. Prerequisites, владение, конфликты и среда не обходятся интервью.
 Продуктовые требования и пять содержательных сценариев согласованы; command-фасады
 проверены и остаются без бизнес-логики. Portable S1 не менялись.
-**Прогресс:** исправление проверено; публикация фиксируется ниже после read-back.
+**Прогресс:** `completed`; исправление проверено и опубликовано.
 **Проверки:** 16 unit tests OK; S2/S3/S4 contract smokes PASS, fixtures
 `/tmp/opencode/mis-s2-mj1d8klq`, `/tmp/opencode/mis-s3-dxd12koo`,
 `/tmp/opencode/mis-s4-contract-7nocz4p2`. S3 registry подтвердил 14 skills и
@@ -677,8 +677,13 @@ baseline `14f5c6ac2b48255cb5e6d033c8a47a1300a9e353`, fingerprint SHA256
 текстовые проверки и tool-contract smokes не доказывают поведение агента при новом
 интервью. Новый fresh-model plan/run pilot не запускался. Потребительские проекты
 и их трекеры не менялись. Блокеров нет; новая реализация не назначена.
-**Коммит:** с сообщением `fix: route bounded task clarification through mis-run`;
-SHA и remote read-back будут внесены отдельной progress-only отметкой.
+**Коммит:** [`e23557c`](https://github.com/atilla777/mis/commit/e23557c274bb9697f0a48b899d26330499106dd9)
+— `fix: route bounded task clarification through mis-run`; обычный non-force push
+в публичный `origin/main`, отдельный `git ls-remote` подтвердил полный SHA,
+после push рабочая копия чистая. Эта отметка — отдельный progress-only docs-коммит.
+Следующее правило выбора: определённая Task без реальных blockers → `/mis-run <ID>`
+(при необходимости с интервью); выделение/изменение объёма, декомпозиции или графа
+→ `/mis-plan`. При реальном blocker — сначала prerequisite/его устранение.
 
 **S1–S11 завершены.** Не начинать другую реализацию автоматически.
 В новой сессии потребителя: «Покажи `/mis-status`». Для нового проекта — готовый
