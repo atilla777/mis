@@ -12,6 +12,12 @@ First installation and explicit Beads preparation use `mis-proj-op-install`.
 Both use this skill's package script; `--install` is only the explicit first-install
 mode and must never be an automatic fallback for missing/invalid update baselines.
 
+Before asking questions, discussing decisions or reporting a problem, load
+`mis-proj-lib-common` and read its `references/dialogue.md` from the same verified
+package location as this skill. Apply these dialogue rules from the start,
+not only at review. If skill discovery is unavailable, read the library and
+resource by their verified absolute paths.
+
 1. Read consumer AGENTS.md, Git status/log, existing installation record and publication rules.
    Preserve all unrelated work. Follow required native OpenCode worktree/session rules;
    never modify the primary copy when the project requires a dedicated worktree.
