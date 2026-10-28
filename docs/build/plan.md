@@ -719,6 +719,51 @@ install читает ресурс из проверенной внешней к�
 **Границы:** только исходный MIS; соседние проекты и Beads не меняются.
 Следующая реализация не назначена.
 
+### Сбор и исследование запроса `/mis-bug` (2026-10-28)
+
+По явному запросу пользователя добавлен один простой project op
+`mis-proj-op-report-bug` и тонкая команда `/mis-bug`. Из соседнего RIS прочитаны
+register-bug и оба investigate-bug на pinned SHA `a2a68cbe0a7c0bd5950cd448fa65f7bcc4424690`;
+адаптация и исключения внесены в source-map. Нет трёх отдельных стадий, адаптера,
+registry, investigation claim/close или особого fix workflow.
+
+Native `bug` может быть дефектом, неудобством либо запросом нового поведения;
+природа явно записывается, подтверждение дефекта не gate для нового поведения.
+Скилл собирает контекст, ограниченно исследует, уточняет существенные ожидания
+по одному вопросу и сохраняет полное содержание/критерии в Beads. All-status
+дубли, exact-ID update, сохранение чужого, fresh read-back и отдельная Dolt
+публикация используют существующую Beads operation. Нет правок приложения,
+claim/close или автоматического run. Посильная определённая работа рекомендуется
+в обычный `/mis-run <ID>`, большой scope — в plan; неполное сообщение сохраняется
+с явными пробелами без ложной готовности. Run различает defect и behavior change,
+включая handoff в существующий implement/TDD. Portable S1/resources/license
+побайтово не менялись. Требования, архитектура, README и приёмка согласованы:
+**15 skills / 6 commands**, без нового runtime-кода или изменения package engine.
+
+**Проверки:** 18 unit tests OK, включая реальные новые skill/command bytes при
+fresh install и update, preflight/conflicting addition refusal до записи,
+apply/read-back/no-op. `python -B tests/s2_beads_smoke.py` — PASS, fixture
+`/tmp/opencode/mis-s2-poh_txmh`: bd 1.3.1 embedded, Bug дефекта `s2-dr9` и запроса
+поведения `s2-m9e`, точные поля, bounded update с сохранением прежнего контекста/
+status/assignee, standalone без parent, native ready eligibility, all-status
+reconciliation без новых записей. Отдельная публикация Dolt подтверждена fresh
+fetch/ancestry и независимым remote clone, revision `thgra8l9q2dmoq1oe9n0m58l1nb23g7b`.
+Git HEAD/worktree/авторские файлы fixture не изменились. Frontmatter 15 names,
+6 command→skill связей/$ARGUMENTS, 51 локальная Markdown-ссылка, portable parity
+и whitespace — PASS. Девять случаев `tests/bug-intake.md` сверены автором с
+инструкциями: дефект/новое поведение/unknown/повтор/закрытая регрессия/exact ID/
+конфликт требований/крупный scope/непроверенная публикация.
+
+**Границы доказательств:** unit/CLI contract и содержательная авторская сверка,
+не fresh-model `/mis-bug`→`/mis-run` pilot, не независимое review и не проверка
+реестра OpenCode. Реальные потребители и их Beads не менялись. Поставка в соседние
+проекты не входит в запрос и не запускается автоматически.
+**Прогресс:** реализация и проверки завершены; commit/non-force публикация с
+remote read-back фиксируются по завершении. Блокеров содержания нет.
+**Следующее действие:** после явного обновления пакета в потребителе —
+`/mis-bug <описание дефекта или желаемого поведения>`; следующая реализация MIS
+не назначена.
+
 **S1–S11 завершены.** Не начинать другую реализацию автоматически.
 В новой сессии потребителя: «Покажи `/mis-status`». Для нового проекта — готовый
 запрос первой установки из README, не `mis-run` до подготовки проекта.

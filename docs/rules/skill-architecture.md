@@ -11,6 +11,7 @@ description: Два сквозных скилла, портативные мет
 | Команда OpenCode | Внутренний сквозной скилл | Результат |
 | --- | --- | --- |
 | `/mis-plan` | `mis-flow-plan` | Согласованный достаточный граф Epic/Task в Beads |
+| `/mis-bug` | `mis-proj-op-report-bug` | Исследованный запрос дефекта/поведения в native Bug для последующего run |
 | `/mis-run` | `mis-flow-run` | Завершённая и проверенная работа с Git/Beads-публикацией |
 | `/mis-status` | `mis-proj-op-show-plan` | Компактное read-only дерево незавершённых работ |
 | `/mis-update` | `mis-proj-op-update` | Проверенное обновление только установленного пакета MIS |
@@ -27,13 +28,14 @@ description: Два сквозных скилла, портативные мет
 | `mis-port-op-review-change` | Portable; перенос | `ris-port-op-review-change`, независимая оценка конкретного снимка |
 | `mis-proj-op-sync-spec` | Project; новый | Обновить конкретное реализованное поведение в `docs/spec/` |
 | `mis-proj-op-beads` | Project; упрощение | `ris-proj-adapter-beads-tasks`, один фиксированный `bd` |
+| `mis-proj-op-report-bug` | Project; упрощение | RIS register/investigate-bug: один сбор/анализ/сохранение, без отдельного fix workflow |
 | `mis-proj-op-show-plan` | Project; упрощение | `ris-proj-op-show-plan`, компактное read-only дерево без Feature-модели |
 | `mis-proj-op-update` | Project; новый | Сравнение точных Git-ревизий, защита локальных правок, ограниченный update script |
 | `mis-proj-op-install` | Project; новый | Установка общим package engine и явная подготовка Beads в проектном Git remote |
 | `mis-proj-op-publish-change` | Project; упрощение | `ris-proj-op-publish-task`, безопасная Git-интеграция/проверка remote |
 | `mis-proj-lib-common` | Shared; сокращение | `ris-proj-lib-common`: контекст, диалог, одноразовые подтверждения, recovery, отчёт |
 
-Всего **14 скиллов, включая 2 основных сквозных**, проектные операции статуса, установки и обновления. Установка/обновление разделены по полномочиям, но используют один package script. Внутренние `references/` и `scripts/` ресурсы не равны новым зарегистрированным скиллам.
+Всего **15 скиллов, включая 2 основных сквозных**, проектные операции регистрации запроса, статуса, установки и обновления. Установка/обновление разделены по полномочиям, но используют один package script. Внутренние `references/` и `scripts/` ресурсы не равны новым зарегистрированным скиллам.
 
 ## Границы ответственности
 

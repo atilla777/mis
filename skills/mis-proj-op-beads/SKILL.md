@@ -74,7 +74,10 @@ typed edges/child selection; проверь как новые, так и сох�
   границам/parent и устойчивой идентичности из запроса. Existing exact match →
   reuse ID; ambiguous → conflict. Никаких обязательных MIS keys/registry.
   `create --type epic|task|bug --title <text> --description <text> --acceptance <text> --json`;
-  optional `--parent <confirmed-open-epic>`. Для Bug нужны actual/expected/repro.
+  optional `--parent <confirmed-open-epic>`. Для Bug нужны actual/expected/repro:
+  дефект либо явно обозначенный запрос нового поведения с текущим/желаемым
+  сценарием. Недоступные факты помечай неизвестными, не выдумывай; неполное
+  сообщение сохраняется с пробелами, без заявления готовности к run.
   Ответ — object с ID; проверь show, membership и повтори поиск collisions.
   Родитель только epic; standalone не требует фиктивного parent/spec/design.
 - **Update:** `update <exact-id> --description … --acceptance … --json` (лишь

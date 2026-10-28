@@ -245,6 +245,50 @@ closed = create(
 bd("close", closed, "--reason", "Fixture requirements commit checked", write=True)
 rows = inventory()
 assert len(rows) == 7 and show(closed)["status"] == "closed"
+
+# report-bug uses the same native type/fields for defects and desired behavior.
+# Fixed content tests storage/read-back, not model investigation or dedup judgment.
+defect = create(
+    "bug",
+    "Pause must stop movement",
+    "Defect report: player reports movement during pause. Expected: no movement. "
+    "Repro: move, pause, observe position. Not independently reproduced; no game "
+    "runtime in this fixture. Cause unknown; evidence is reporter observation.",
+    "Position stays unchanged while paused; movement resumes after unpause.",
+)
+behavior = create(
+    "bug",
+    "Replay match with the same seed",
+    "Desired behavior, not a confirmed defect. Current: defeat screen has no replay. "
+    "Requested: replay the same seed/settings, reset match progress. "
+    "Scope: defeat screen only, no saved history or new game modes.",
+    "After defeat, replay starts a fresh match with the previous seed/settings. "
+    "Check reset progress and unchanged normal new-match behavior.",
+)
+original = show(behavior)
+bd(
+    "update",
+    behavior,
+    "--description",
+    original["description"] + " Accepted: reset score to zero.",
+    "--acceptance",
+    original["acceptance_criteria"] + " Initial score is zero.",
+    "--if-status",
+    "open",
+    "--if-assignee",
+    "",
+    write=True,
+)
+saved = show(behavior)
+assert saved["description"].startswith(original["description"])
+assert saved["acceptance_criteria"].endswith("Initial score is zero.")
+for field in ("status", "assignee", "notes", "issue_type", "title", "parent"):
+    assert saved.get(field) == original.get(field), field
+assert "parent" not in saved
+assert behavior in {r["id"] for r in bd("ready", "--limit", "0")}
+assert not bd("dep", "list", behavior, "--type", "blocks", "--direction=down")
+rows = inventory()
+assert len(rows) == 9
 # Reconcile fixed proposals by their full known content; same IDs, no writes.
 snapshot = {r["id"]: show(r["id"]) for r in rows}
 for identifier, expected in snapshot.items():
@@ -294,7 +338,7 @@ assert (
     run("dolt", "merge-base", required, "origin/main", cwd=database).stdout.strip()
     == required
 )
-assert len(inventory()) == 7
+assert len(inventory()) == 9
 assert run("git", "rev-parse", "HEAD").stdout == before_git
 assert run("git", "worktree", "list", "--porcelain").stdout == before_worktrees
 after_files = {
@@ -317,6 +361,8 @@ print(
                 "increment": increment,
                 "standalone": standalone,
                 "closed": closed,
+                "defect": defect,
+                "desired_behavior": behavior,
             },
         },
         indent=2,

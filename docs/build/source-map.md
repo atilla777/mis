@@ -47,7 +47,24 @@ Slivka; её точная копия сохранена в `skills/LICENSE-RIS`.
 - `skills/mis-flow-plan/SKILL.md` — единый сценарий Beads-планирования.
 - `skills/mis-flow-run/SKILL.md` — одна Task/Bug от выбора до публикации, включая нативный OpenCode worktree.
 
-Slash-фасады пакетируются в `commands/opencode/mis-plan.md`, `commands/opencode/mis-run.md`, `commands/opencode/mis-status.md`, `commands/opencode/mis-install.md`, `commands/opencode/mis-update.md`. Содержат минимальную инструкцию загрузить соответствующий скилл и передать `$ARGUMENTS` без дополнительной бизнес-логики.
+Slash-фасады пакетируются в `commands/opencode/mis-{plan,bug,run,status,install,update}.md`. Содержат минимальную инструкцию загрузить соответствующий скилл и передать `$ARGUMENTS` без дополнительной бизнес-логики.
+
+### Сбор запроса `mis-bug` (2026-10-28)
+
+`skills/mis-proj-op-report-bug/SKILL.md` — сокращённая проектная адаптация идей
+`skills/ris-proj-op-register-bug/SKILL.md`,
+`skills/ris-proj-op-investigate-bug/SKILL.md` и
+`skills/ris-port-op-investigate-bug/SKILL.md` из зафиксированного RIS SHA выше
+(HEAD соседнего `/home/aleksei/plums/ris` проверен перед чтением).
+Сохранены исходный смысл/факты vs гипотезы, all-status reconciliation,
+bounded investigation, exact update/read-back, сохранение критериев и остановка
+до исправления. Вместо трёх скиллов — один project op на существующем MIS Beads;
+нет resolver/adapter, stable-key registry, investigation claim/version protocol,
+автоматического disposition-close, отдельного Git report или fix-bug flow.
+Новый явно обозначенный запрос поведения тоже сохраняется native `bug`;
+подтверждение дефекта не служит gate для такого запроса. Публикация только по
+существующему MIS Dolt protocol. Portable S1/resources и MIT notice не меняются;
+command-фасад — собственный, без логики вне скилла.
 
 ## 5. Сознательно не переносить
 

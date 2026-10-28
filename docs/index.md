@@ -10,6 +10,7 @@ okf_version: "0.2"
 - [Видение и границы](product/vision.md) — зачем существует MIS, что намеренно не поддерживается.
 - [Модель Milestone / Task](product/work-model.md) — сущности, Beads-граф и критерии достижения.
 - [Планирование (`mis-plan`)](product/planning.md) — входы, результаты, интервью, создание Beads-записей.
+- [Запрос изменения (`mis-bug`)](product/bug-intake.md) — сбор сведений, исследование и подробный Bug для последующего run.
 - [Выполнение (`mis-run`)](product/execution.md) — автономная работа, worktree, проверки, публикация.
 - [Спецификации и знания](product/specifications.md) — `docs/product/`, `docs/spec/`, `docs/rules/`, моменты обновления.
 - [Пользовательские команды и отчёты](product/experience.md) — планирование, выполнение, статус и следующее действие.
