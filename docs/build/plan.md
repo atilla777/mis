@@ -561,6 +561,71 @@ upstream. Итоговая отметка — отдельный progress-only d
 
 ## Рекомендуемое следующее действие
 
+### Поставка S11 в snyrk и yambrix (2026-10-28)
+
+По отдельному запросу пользователя обновить только установленные MIS-пакеты
+обоих проектов до опубликованного `173f9da9c0054786854524696f11cbb11f4e1038`.
+Исходные копии чистые: snyrk `aa59740`, MIS baseline `287df51`; yambrix `593a33f`,
+MIS baseline `4f65cd7`. Exact preflight/apply/no-op изменили в каждом ровно три
+planning SKILL.md и installation record; код, настройки и Beads не менялись.
+Snyrk — own native worktree `.sdlc/worktrees/mis-planning-capacity`, ветка
+`chore/mis-planning-capacity`; session_move и Git root/common-dir подтверждены.
+В Yambrix обновлена основная локальная копия (её правила это допускают).
+Реестр OpenCode в обеих locations подтвердил 14 точных MIS ID/paths/full bodies
+и пять command names; templates проверяются пакетом, не заявлены API-полями.
+Yambrix: npm ci/check/build PASS, 0 vulnerabilities; обычные warnings esbuild
+install-script и bundle >500 kB. Snyrk: Node24.22.1 npm ci offline, format/lint/
+typecheck/check:i18n PASS; text:verify PASS; 488 unit passed, 11 skipped.
+Первый unit run получил missing Brotli; повтор с существующей pinned Python venv
+(`fontTools4.67.0`, `brotli1.2.1`) PASS без изменения versioned файлов.
+Первый Snyrk full publication gate остановился на занятом чужим сервером 4173
+(он не останавливался).
+Реальный `CI=true npm run check` подтвердил 488 unit/11 skipped, пять dev browser
+tests и build, затем test:e2e:build отказал из-за порта; оставшиеся шаги не запускались.
+Receipt — `/tmp/opencode/snyrk-capacity-full-check.log`.
+
+Пользователь затем явно поручил review/публикацию обоих проектов. Первое независимое
+review `ses_e7da9b999ffe97IuSk6nGFgYMz` подтвердило local package pass без required
+fixes; продолжение упёрлось в Go usage limit native Snyrk advanced (`glm-5.3`).
+По отдельному явному разрешению пользователя использован native advanced Yambrix
+(`openai/gpt-6.1-sol`) для независимого review обоих проектов, без model override
+и изменений конфигурации. Контекст `ses_e7d9a521affeOxhT22auglDV3v` подтвердил
+полные staged trees: snyrk `054e32909c0864e07f333422b726b2a1e03296b3`, yambrix
+`4c7bc878ba526a16e726ef59768a36d22eef078e`, без exclusions и required fixes.
+
+Snyrk gate повторён с неизменными npm scripts/CI=true в изолированном Linux
+network namespace (`unshare`, loopback), без остановки/переиспользования чужого
+сервера. Worktree-local `.venv-fonts` создана по hash-pinned requirements;
+receipt `/tmp/opencode/snyrk-capacity-isolated-full-check.log` содержит Node24.22.1,
+Python toolchain и точный tree. `text:verify` + полный `check` — PASS:
+499 unit tests, browser dev/build/sample/localization 5/6/4/5, все playtest-наборы
+и bundle. Штатный production deep-debug skipped с warning, не выдан за проверенный.
+Тот же независимый reviewer после завершения gate дал publication **pass** обоим.
+
+**Yambrix опубликован:** [`4525e01`](https://github.com/atilla777/yambrix/commit/4525e0135e1e3841a1aca16c308c54f44a951c07),
+точный reviewed tree; non-force push в `origin/main`, отдельный ls-remote/fetch/
+ancestry подтвердили SHA, основная копия чистая, updater verified no-op.
+Реальный skill tool загрузил обновлённый plan-tasks из основной копии.
+**Snyrk опубликован:** [`161d70c`](https://github.com/atilla777/snyrk/commit/161d70c16c87c75870fb0862f889ee43968b786e),
+точный reviewed tree, non-force push в `origin/main`. Неизменённый pre-push hook
+повторил text:verify + полный check в isolated namespace; receipt
+`/tmp/opencode/snyrk-capacity-push-final.log` — PASS. SSH transport шёл через
+собственный ранее подключённый ControlMaster socket, без сетевого доступа из
+namespace. Первый transport отказал на owner-check системного ssh_config внутри
+user namespace ещё до push; повтор с `ssh -F /dev/null` к тому же готовому socket
+успешен, hooks/SSH host verification при установлении master не обходились.
+Отдельные ls-remote/fetch/ancestry подтвердили полный SHA; собственная копия чистая.
+Основная чистая snyrk fast-forward обновлена, SHA/tree совпали с опубликованными,
+updater verified no-op. Собственный SSH master штатно закрыт; чужой preview сохранён.
+Финальный полный authenticated HTTP registry в **обеих основных копиях** подтвердил
+14 точных MIS ID/paths/full bodies и пять команд; обе Git-копии чистые. Initial
+CLI registry main snyrk был обрезан и не засчитан; credentials не выводились.
+**Прогресс:** `completed`, блокеров нет. Обновлён только пакет, без новых изменений
+game/AGENTS/config/dependencies/Beads и без deploy/смены приватности.
+Нового model-plan пилота нет; планирование/исполнение Task не запускались.
+Следующая реализация не назначена. Рекомендация: новая сессия потребителя и явный
+`mis-plan` ближайшей вехи с проверкой размера Task; не перепланировать автоматически.
+
 ### Точка входа AGENTS.md (2026-10-27)
 
 По явному запросу пользователя `AGENTS.md` сокращён до навигации и обязательных
