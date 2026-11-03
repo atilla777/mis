@@ -857,12 +857,38 @@ dependency, согласованные execution/project-contract/acceptance/sou
 читает Git blobs и не генерирует AGENTS/проектную тестовую политику. Добавлены
 содержательные случаи выбора и actual-package install/update unit case.
 
-**Прогресс:** `in_progress`; до публикации обязательны проверки и независимое
-read-only review. Полного модельного пилота/замеров скорости не планируется:
-изменены инструкции и поставляемый ресурс, не CLI/API протоколы или продукт.
-Полный набор старых Beads/worktree smokes не назначен без затронутого контракта.
-Результаты, review, commit и публикация будут зафиксированы после подтверждения.
-Следующей самостоятельной реализации нет; потребители автоматически не обновляются.
+**Проверки:** `python -B -m unittest discover -s tests -p 'test_*.py' -v` —
+**19 tests OK**, включая реальные source bytes нового ресурса при install/update,
+exact package parity/no-op и сохранность строгой политики в AGENTS потребителя.
+Авторская содержательная сверка 11 случаев `tests/verification-selection.md`:
+docs/model/UI/build-dependencies/unknown, строгая и неясная политика, evidence
+reuse, merge/environment changes, rebuild и неполные/flaky claims. Проверены
+15 frontmatter IDs, Python AST, неизменность portable references, publication
+scope/common secret patterns и whitespace. Установщик не генерирует инструкции
+проекта; fresh install не создаёт AGENTS, update сохраняет существующий.
+
+**Независимое read-only review:** `ses_e5ff3a8d7ffefSBAnkylCi5uN8` — **pass**,
+required high/medium и optional low отсутствуют. Полный prospective snapshot:
+67 файлов без exclusions, baseline `1c5ace7fb2128309afd45f8faed32f3a0820a178`,
+tree **`a2ee15365e6539dd27c3941302f15e3d524f139e`**; index перед commit дал тот
+же tree. Reviewer независимо повторил 19 tests и whitespace, проверил 14 локальных
+Markdown-ссылок изменений, сценарии и отсутствие генератора AGENTS. Текущая
+итоговая запись — progress-only overlay, не новое runtime approval.
+
+**Ограничения:** это source/instruction и package-delivery evidence, не fresh-model
+pilot, замер скорости, доказательство устранения flaky или новая полная приёмка
+workflow. Полный набор старых Beads/worktree smokes не назначен без затронутого
+CLI/API контракта. Числа Snyrk не перенесены в нормативы MIS; существующим
+потребителям политика не навязывается и пакет автоматически не обновляется.
+
+**Прогресс:** `completed`; опубликован коммит
+[`039f0e2`](https://github.com/atilla777/mis/commit/039f0e2772d1d01fe7b82769138e2330fac2d45d)
+— `fix: distinguish verification gates and reuse snapshot evidence`.
+Единственный outgoing implementation commit, обычный non-force push в публичный
+origin/main без обхода hooks; отдельный `git ls-remote` подтвердил полный SHA,
+после push копия чистая. Эта итоговая отметка — отдельный progress-only docs commit.
+Блокеров нет. Следующей самостоятельной реализации нет; обновление потребителей
+или пересмотр их gates требуют отдельного поручения.
 
 **S1–S11 завершены.** Не начинать другую реализацию автоматически.
 В новой сессии потребителя: «Покажи `/mis-status`». Для нового проекта — готовый
