@@ -48,7 +48,12 @@ resource by their verified absolute paths.
    on I/O interruption preserve the copy and investigate, never reset local work.
 6. Verify the real OpenCode registry for this consumer location: exact target MIS IDs,
    paths/bodies and command templates, not just counts or an unfiltered truncated list.
-   Run relevant consumer checks. Before publication obtain independent read-only review
+    Read `references/verification.md` from the same `mis-proj-lib-common` before
+    choosing consumer checks: preserve the project's gate and stricter policy,
+    add affected checks, reuse applicable exact-snapshot evidence without bypassing
+    hooks/CI. Do not impose full regression on each push or silently shrink an
+    existing gate under missing/ambiguous policy. Updating MIS does not authorize
+    rewriting consumer policy. Before publication obtain independent read-only review
    when required by the project, bound to the complete candidate tree. Load
    `mis-proj-lib-common` and its `references/delegation.md` for that review: use
    a separate read-only `advanced` context, never the author/designer/fixer.

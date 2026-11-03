@@ -74,7 +74,18 @@ apply to the reviewed version; later edits or integration require reassessment.
    version and the bytes actually exercised. Tool presence, a listed command or
    an earlier passing tree is not execution evidence. Reuse suitable current
    checks; repeat only for changed coverage, failures or unresolved concerns.
-   Use authorized read-only checks; do not mutate files or shared services.
+    Use authorized read-only checks; do not mutate files or shared services.
+    Assess the project's mandatory gate, affected checks and full acceptance as
+    distinct claims. Respect stricter policy; an absent/ambiguous policy cannot
+    justify silently shrinking an existing gate. Check the short change/consumer/
+    risk rationale and unverified scope, not a ceremonial per-edit report. Reject
+    weakened assertions, removed scenarios/browsers, disabled tests or product edits
+    merely to get green; a move between levels must explain preserved protection.
+    A smaller gate does not prove faster full regression, an incomplete/failed/unrun
+    full suite is not acceptance, and one pass does not prove a flakiness fix.
+    Local/CI runs are duplicates only with evidence of equivalent conditions; never
+    endorse bypassing hooks/gates. For a checked build claim bind evidence to both
+    exact source and delivered artifact, not an unverified subsequent rebuild.
    Assess final code/tests and their sufficiency, not the author's internal work
    or historical RED/GREEN chronology. Executor testing/TDD obligations remain
    theirs; an absent implementation log is not review admission evidence. Never

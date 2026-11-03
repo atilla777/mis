@@ -81,9 +81,22 @@ Unavailable required resources block dependent work, not independent inspection.
 4. Select and **run** the smallest sufficient affected check set: new/changed tests,
    existing regression tests and consumers of changed contracts, plus applicable
    static/contract/integration checks. Use project commands and inspect actual
-   exits/results. Run a full suite only when project rules require it or impact
+    exits/results. Distinguish the project's mandatory fast gate, affected checks
+    and full candidate/build acceptance; do not infer full regression on every
+    commit/build/push. Missing or ambiguous policy never authorizes shrinking an
+    existing gate: obtain an agreed policy first, preserving current obligations.
+    Briefly explain change, consumers, protected risks, checks/results and gaps in
+    the existing handoff, not a new per-edit report or mandatory affected-test tool.
+    Run a full suite only when project rules require it or impact
    cannot be covered reliably by a narrower set; state the reason. After edits
-   rerun invalidated checks, retaining suitable current evidence for other parts.
+    rerun invalidated checks, retaining suitable current evidence for other parts.
+    Do not remove assertions, scenarios or browsers, disable tests or alter product
+    behavior to get green. Explain preserved risk coverage for any authorized move
+    between test levels. A smaller gate is not a faster full regression. Gate pass
+    is not full acceptance/release readiness; unrun, failed or incomplete full suites
+    remain so, and one pass does not establish that flakiness is fixed. Do not bypass
+    hooks/gates; local and CI runs may protect different conditions. Reuse evidence
+    only for the same snapshot/conditions or with explicit applicability grounds.
    Prefer deterministic tests for parsing, arithmetic and error handling. For
    instruction edits check prescriptions, names, resources, links, dependencies
    and parity where relevant; do not infer observed agent behavior from review.

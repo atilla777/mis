@@ -3,6 +3,7 @@
 import importlib.util
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -143,6 +144,62 @@ class InstallTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("preflight only", result.stdout)
         self.assertEqual(self.contents(), {})
+
+    def test_current_package_install_update_and_consumer_policy_preserved(self):
+        # Commit current source bytes in a disposable repository: the engine must
+        # deliver the new resources, not the real repository's older HEAD.
+        old = self.rev
+        self.install(apply=True)
+        policy = self.project / "AGENTS.md"
+        policy.write_text("Require full regression on every push. Preserve hooks.")
+        for directory in ("skills", "commands"):
+            shutil.copytree(
+                ROOT / directory, self.source / directory, dirs_exist_ok=True
+            )
+        subprocess.run(["git", "-C", str(self.source), "add", "."], check=True)
+        subprocess.run(
+            [
+                "git",
+                "-C",
+                str(self.source),
+                "-c",
+                "user.name=Test",
+                "-c",
+                "user.email=test@example.invalid",
+                "commit",
+                "-qm",
+                "current package",
+            ],
+            check=True,
+        )
+        target = subprocess.check_output(
+            ["git", "-C", str(self.source), "rev-parse", "HEAD"], text=True
+        ).strip()
+        installer.update(
+            self.project, self.source, target, from_revision=old, apply=True
+        )
+        fresh = Path(self.tmp.name) / "fresh"
+        fresh.mkdir()
+        installer.update(fresh, self.source, target, install=True, apply=True)
+        for project in (self.project, fresh):
+            for relative, content in installer.snapshot(self.source, target).items():
+                self.assertEqual(
+                    (project / ".opencode" / relative).read_bytes(), content
+                )
+            self.assertEqual(installer.update(project, self.source, target)[1], [])
+            self.assertEqual(
+                (
+                    project
+                    / ".opencode/skills/mis-proj-lib-common/references/verification.md"
+                ).read_bytes(),
+                (
+                    ROOT / "skills/mis-proj-lib-common/references/verification.md"
+                ).read_bytes(),
+            )
+        self.assertEqual(
+            policy.read_text(), "Require full regression on every push. Preserve hooks."
+        )
+        self.assertFalse((fresh / "AGENTS.md").exists())
 
 
 if __name__ == "__main__":
