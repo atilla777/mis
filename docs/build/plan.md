@@ -6,6 +6,76 @@ description: Единственный простой список прогрес
 ---
 # Простой план создания MIS
 
+## Назначенная работа — MIS Dispatcher (2026-11-11)
+
+**Прогресс:** `completed`. Границы — Go CLI для текущего проекта, без реальных
+AI-запусков в пользовательских проектах и без установки бинарника в систему.
+**Минимальный дизайн:** Go `cmd/mis-dispatcher` + internal package; native
+`opencode api` как transport с штатными discovery/auth, `bd` CLI как единственное
+хранилище. Канонический первый Git checkout, проверка `bd where`, flock по hash
+канонического пути. Defaults → global → project YAML перечитываются каждый цикл.
+Beads metadata `mis_dispatcher` хранит version/project/task/client-generated
+session ID/phase до API create; OpenCode получает ту же связь при create.
+Резервирование guarded open/unassigned, native atomic claim выполняет только
+существующий `/mis-run`; минимальная кооперативная проверка reservation в run.
+Неизвестные create → GET заранее записанного ID, без повторного create; durable
+submitted до command, неизвестная отправка никогда не повторяется автоматически.
+Crash в промежутке оставляет резервирование для ручной проверки существующей
+сессии; никакого собственного task DB/журнала. Closed Beads — проверяемый сигнал
+завершения задачи, idle — PAUSED. Pending forms/permissions — WAITING_USER,
+native active — RUNNING, structured outcome failed — FAILED; учитываются дети.
+Конфликт inventory останавливает новые запуски, не существующие сессии.
+**Проверенные контракты:** installed OpenCode 2.0.32 `/openapi.json`, API docs V2,
+session.create с supplied ID/location/metadata и GET реально проверены на idle
+fixture `/tmp/opencode/mis-dispatcher-contract-geancm0l`; prompt не отправлялся.
+bd ready/list/show/where/update help и реальный guarded `--set-metadata` read-back:
+значение сохраняется строкой JSON, остальная metadata не заменяется. Claim и
+worktree остаются прежним MIS; install/update package engine не собирает бинарник.
+**Реализация:** `cmd/mis-dispatcher`, internal package, YAML overlay, CLI/API
+adapters, safe reservation/at-most-once submit, периодический цикл, native pending
+forms/permissions и children, cancel/SIGINT/SIGTERM без session interrupt.
+Bootstrap отдельный, pinned Git blobs + tests/build + atomic user binary replace;
+project install/update контракт сохранён. Документация и ссылка AGENTS добавлены.
+**Проверки:** Go build / `go test -race -count=1 ./...` / `go vet ./...` — PASS;
+23 Python tests (включая 4 isolated-HOME bootstrap tests с fake Go) — PASS.
+Регрессии S2/S3/S4/S9 — PASS: fixtures `/tmp/opencode/mis-s2-2br60yqi`,
+`/tmp/opencode/mis-s3-rug48dpj`, `/tmp/opencode/mis-s4-contract-mns1s17h`,
+`/tmp/opencode/mis-s9-ephfx9qq`. Discovery — 15 skills с точными bytes/paths.
+Реальный собранный binary в S3 disposable consumer с hard zero limits: native
+preflight/list/ready/snapshot, Ready1/Active0/Open0/Started0, SIGINT → exit0;
+ни одного prompt/claim/новой сессии от dispatcher. Это не model e2e.
+**Review:** independent read-only advanced `ses_e35ef2336ffeBwU2ifW1tM5MLP`:
+initial changes required, M1 (waiting background child скрывал working parent)
+и M2 (лишняя dispatcher-сессия той же Task не обнаруживалась). Исправлены:
+native active parent считается консервативно, пока нет его собственного pending;
+reverse inventory проверяет точную session/reservation. Regression cases добавлены.
+Дополнительно real zero-limit run выявил truncated JSON в OpenCode CLI 2.0.32
+stdout pipe; transport теперь получает stdout через временный regular file
+(0600, cleanup), повторный zero-limit run PASS. Beads routing/preflight перенесены
+в каждый цикл: временный отказ в том числе на старте не завершает scheduler.
+**Границы:** нет реального модельного `/mis-run` запуска диспетчером и установки
+в пользовательский HOME. Кооперативная reservation не защищает от произвольного
+external `bd --claim`/старого уже загруженного flow. Crash до/после submit marker
+может потребовать ручной отправки в той же сессии; at-most-once не exactly-once.
+Без native признака drain-wait активный parent с waiting child может консервативно
+занимать слот; это не разрешает превысить active limit. Canonical root relocation
+требует ручного reconciliation. Старые remote/ручной merge authority не менялись.
+**Финальное review:** тот же независимый advanced-контекст — **PASS**, M1/M2
+resolved, remaining required findings нет. Полный 20-file кандидат относительно
+`e70a242`, fingerprint `sorted path + NUL + bytes + NUL`:
+`b1e83f1d3ad44b688f13a6dc7154ee365fffdd17295bdbab011e2e03feac2428`.
+Reviewer самостоятельно повторил race tests/vet/build/23 Python tests/whitespace;
+эти progress-only отметки исключены из runtime review fingerprint.
+Реальный bootstrap дополнительно дважды прошёл tests/build/atomic install в
+**disposable HOME** `/tmp/opencode/mis-dispatcher-bootstrap-real-t7qze5mg/home`:
+ELF bytes, mode, отсутствие staged leftovers и сохранность YAML подтверждены.
+Первый запуск через mise Python shim сбросил PATH и не нашёл настроенную Go
+версию; повтор через реальный Python interpreter + явный установленный Go прошёл.
+Никакой установки/настройки Go в системе не делалось.
+**Коммит:** текущая реализация фиксируется логическим Git-коммитом; SHA — в Git.
+**Блокер:** нет. Новая реализационная сессия не назначена; реальные AI-пилоты и
+установка в рабочий HOME не выполнялись и требуют отдельного разрешения.
+
 Это **план разработки самого пакета MIS**, а не рабочий процесс MIS для проектов-потребителей. Для этого репозитория **не применять MIS, RIS, Beads, формулы, эпики, roadmap/skills-фреймворк**. Только Git, проверки и этот Markdown.
 
 ## Правила коротких сессий

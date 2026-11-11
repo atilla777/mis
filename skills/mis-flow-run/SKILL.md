@@ -27,7 +27,20 @@ Native Bug может быть дефектом либо явно приняты
    `AGENTS.md`, относящиеся `docs/product/`, `docs/spec/`, `docs/rules/`, prepared
    Beads workspace и capabilities. Не init/install/configure. Выясни эффективный
    bd actor и реальное владение сессией; одинаковый actor не доказывает отсутствие
-   другого writer. Отсутствующий root/правила/существенные права — точный blocker.
+    другого writer. Отсутствующий root/правила/существенные права — точный blocker.
+   **MIS dispatcher reservation v1:** перед выбором/claim прочитай metadata
+   `mis_dispatcher` точного Bead (bd сохраняет здесь JSON как строку). Если ключ
+   присутствует, нужны version=1, точные task/project и session, совпадающий с
+   **текущим** OpenCode Session ID; подтверди matching `metadata.mis_dispatcher`
+   этой сессии через API и canonical Git common-dir проекта. Чужая, повреждённая
+   или неоднозначная связь — остановка без claim/записи. Не убирай резервирование.
+   Текущий Session ID можно получить из native `OPENCODE_SESSION_ID` в shell;
+   если он отсутствует, не угадывай его по заголовку/возрасту сессии.
+   Dispatcher только резервирует и отправляет `/mis-run`; единственный atomic
+   `bd update --claim` остаётся ниже в этом workflow, после проверки требований.
+   В ручной выборке без ID исключай все зарезервированные записи; для продолжения
+   пользователь открывает уже связанную сессию, не создаёт новую по тому же ID.
+   Перед самым claim перечитай reservation ещё раз: новая чужая связь — blocker.
 2. С ID прочитай точную запись; допустимы только Task/Bug (native `task|bug`).
    Epic — не исполняемая работа. Без ID сначала найди собственную прерванную
    `in_progress` работу в all-status inventory, проверь её claim, сессию/worktree

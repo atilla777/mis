@@ -12,6 +12,7 @@ RIS/MIS workflow, Beads или автоматическую декомпозиц
 - [Карта переноса](docs/build/source-map.md) — источники RIS, ресурсы и допустимые адаптации;
   [архитектура скиллов](docs/rules/skill-architecture.md) — правила устройства пакета.
 - [Приёмка](docs/build/acceptance.md) — критерии и границы доказательств готовности.
+- [MIS Dispatcher](docs/product/dispatcher.md) — Go-утилита запуска ready-задач.
 
 ## Обязательные ограничения
 

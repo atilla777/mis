@@ -36,6 +36,13 @@ writer. Не меняй статус/assignee, scope или граф ради у
 
 ## Atomic claim
 
+Если есть metadata `mis_dispatcher`, сначала применяй **MIS dispatcher reservation v1**
+из `mis-flow-run`: exact текущая сессия и metadata read-back, не только общий actor.
+Непосредственно перед claim заново проверь резервирование. Dispatcher не claim-ит
+задачи и не меняет actor/status; он использует guarded metadata reservation.
+Это кооперативная защита MIS: произвольный внешний `bd --claim` её не соблюдает;
+при таком конфликте остановись, не отбирай задачу.
+
 После свежей проверки unassigned open или assigned-to-self open и eligibility:
 
 `bd -C <root> --sandbox update <exact-id> --claim --json`

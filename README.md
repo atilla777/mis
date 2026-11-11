@@ -107,6 +107,30 @@ reviewer-контекст. Другие версии/engine modes требуют
 после move, но новая независимая сессия не наследует этот контекст. Для неё
 используйте versioned установку выше, а не скрытое копирование во время Task.
 
+## Автоматический запуск ready-задач
+
+Необязательный **`mis-dispatcher`** — отдельный Go-бинарник, без LLM-оркестрации
+и собственного UI. Запускайте из подготовленного проекта:
+
+```sh
+cd /path/to/project
+mis-dispatcher
+```
+
+Он сразу и затем раз в 60s выбирает самые старые ready Task/Bug и запускает
+`/mis-run <ID>` в отдельных обычных OpenCode 2 сессиях. По умолчанию: **6 активных,
+12 открытых** задач на проект. Ожидающие человека/idle/error остаются открытыми,
+но не занимают активный слот. Ctrl+C останавливает диспетчер, **не** AI-сессии.
+
+Конфигурация: defaults → `~/.config/mis/dispatcher.yaml` (с XDG_CONFIG_HOME) →
+`.mis/dispatcher.yaml`, перечитывается каждый цикл. Бинарник собирается из этого
+репозитория (`go build ./cmd/mis-dispatcher`) и один раз устанавливается в
+`~/.local/bin` явным `python3 scripts/install-dispatcher.py FULL_REVIEWED_SHA`.
+Проектные `/mis-install` и `/mis-update` глобальный бинарник не пересобирают.
+Нужен обновлённый MIS с reservation v1; неизвестные отправки автоматически не
+повторяются. Сборка/безопасная установка, YAML, восстановление и границы MVP —
+в [документации диспетчера](docs/product/dispatcher.md).
+
 ## Профили моделей и субагенты
 
 Для plan/run подготовьте доступные OpenCode-агенты **`standard`** и **`advanced`**
@@ -212,6 +236,8 @@ opencode api get '/api/command?location%5Bdirectory%5D=/absolute/test/project'
 ## Проверки разработки
 
 ```sh
+go test -race ./...
+go build -o /tmp/opencode/mis-dispatcher ./cmd/mis-dispatcher
 python -B -m unittest discover -s tests -p 'test_*.py' -v
 python -B tests/s2_beads_smoke.py
 python -B tests/s3_execution_smoke.py
