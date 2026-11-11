@@ -21,6 +21,21 @@ func CanonicalProject(ctx context.Context, cwd string, run Runner) (string, erro
 }
 
 func ProjectRoot(ctx context.Context, cwd string, run Runner) (string, error) {
+	root, err := canonicalGitRoot(ctx, cwd, run)
+	if err != nil {
+		return "", err
+	}
+	for _, path := range []string{"AGENTS.md", "docs/product", "docs/rules", "docs/spec", ".opencode/mis-installation"} {
+		if _, err := os.Stat(filepath.Join(root, path)); err != nil {
+			return "", fmt.Errorf("not a prepared MIS project: %s: %w", path, err)
+		}
+	}
+	return root, nil
+}
+
+// Status needs only the selected Git checkout and its Beads database, not an
+// installed execution environment, scheduler configuration or OpenCode server.
+func canonicalGitRoot(ctx context.Context, cwd string, run Runner) (string, error) {
 	// Git's first worktree is the canonical checkout, even from linked worktrees.
 	data, err := run(ctx, "git", "-C", cwd, "worktree", "list", "--porcelain", "-z")
 	if err != nil {
@@ -33,11 +48,6 @@ func ProjectRoot(ctx context.Context, cwd string, run Runner) (string, error) {
 	root, err := filepath.EvalSymlinks(strings.TrimPrefix(first, "worktree "))
 	if err != nil {
 		return "", err
-	}
-	for _, path := range []string{"AGENTS.md", "docs/product", "docs/rules", "docs/spec", ".opencode/mis-installation"} {
-		if _, err := os.Stat(filepath.Join(root, path)); err != nil {
-			return "", fmt.Errorf("not a prepared MIS project: %s: %w", path, err)
-		}
 	}
 	return root, nil
 }

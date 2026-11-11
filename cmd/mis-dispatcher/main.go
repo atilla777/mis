@@ -19,14 +19,27 @@ func main() {
 }
 
 func run() error {
-	if len(os.Args) != 1 {
-		return fmt.Errorf("usage: mis-dispatcher (no subcommands or arguments)")
+	args := os.Args[1:]
+	if len(args) == 1 && (args[0] == "--help" || args[0] == "-h") {
+		fmt.Println("usage: mis-dispatcher [--status [ID]]\nWithout arguments: run the scheduler. --status: print the read-only plan once.")
+		return nil
+	}
+	status := len(args) >= 1 && args[0] == "--status"
+	if len(args) != 0 && (!status || len(args) > 2 || (len(args) == 2 && (args[1] == "" || args[1][0] == '-'))) {
+		return fmt.Errorf("usage: mis-dispatcher [--status [ID]]")
 	}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	cwd, err := os.Getwd()
 	if err != nil {
 		return err
+	}
+	if status {
+		id := ""
+		if len(args) == 2 {
+			id = args[1]
+		}
+		return dispatcher.ShowStatus(ctx, cwd, id, dispatcher.Exec, os.Stdout)
 	}
 	root, err := dispatcher.ProjectRoot(ctx, cwd, dispatcher.Exec)
 	if err != nil {

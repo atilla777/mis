@@ -26,7 +26,7 @@ func Exec(ctx context.Context, name string, args ...string) ([]byte, error) {
 	// OpenCode 2.0.32 may exit before its piped stdout drains (observed truncated
 	// /openapi.json at 196608/229376 bytes). A regular file avoids that CLI bug.
 	dir := ""
-	if info, err := os.Stat("/tmp/opencode"); err == nil && info.IsDir() {
+	if info, err := os.Stat("/tmp/opencode"); os.Getenv("TMPDIR") == "" && err == nil && info.IsDir() {
 		dir = "/tmp/opencode"
 	}
 	output, err := os.CreateTemp(dir, "mis-dispatcher-response-*")

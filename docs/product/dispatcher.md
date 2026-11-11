@@ -2,7 +2,7 @@
 type: Feature Contract
 title: MIS Dispatcher
 status: stable
-description: Детерминированный запуск ready Beads Task/Bug в отдельных OpenCode-сессиях.
+description: Детерминированный запуск ready Beads Task/Bug и разовый просмотр дерева статуса без LLM.
 ---
 # MIS Dispatcher
 
@@ -12,6 +12,9 @@ MIS-проекта. Выбирает самые старые native ready Task/B
 LLM для оркестрации, не создаёт worktree, не пишет код и не меняет правила
 публикации/ручного merge. Всё исполнение, claim, проверки, review и Git/Beads
 остаются существующему MIS и правилам потребителя.
+
+`mis-dispatcher --status [ID]` — независимый режим просмотра того же проекта:
+один read-only отчёт о незавершённых вехах и задачах, без модели и запуска scheduler.
 
 ## Сборка и установка
 
@@ -73,6 +76,56 @@ redirect overrides отвергаются. Один checkout = один MIS-пр
 имя — SHA256 пути; kernel освобождает lock при выходе/падении. Lock-файл не
 удаляется (иначе возможны два заблокированных разных inode). Разные проекты
 независимы и имеют собственные лимиты, не общекомпьютерную квоту.
+
+## Разовый статус без LLM
+
+```sh
+mis-dispatcher --status       # весь незакрытый план
+mis-dispatcher --status ID    # точный ID и его поддерево
+mis-dispatcher --help
+```
+
+Компактный Markdown-список в формате `/mis-status`: цветные Epic, вложенные
+Task/Bug, закрыто/всего прямых детей, ○/▶/🔒/🐛, P0/P1, assignee и просроченные
+сроки. Закрытые задачи скрыты, но участвуют в счётчиках. Закрытые ancestors с
+открытыми потомками и явно выбранный закрытый root остаются как контекст.
+Пустые открытые Epic видимы. Standalone записи — «Без вехи».
+
+Parent берётся только из native `parent-child`, blockers — из направленных
+`blocks`, не из префикса ID. Закрытый prerequisite не блокирует. Внешние blockers
+показаны inline, без отдельного дерева. Полный режим читает unlimited all-status
+inventory всех типов; ID-режим — точный root, полные direct-child selections
+рекурсивно и необходимые ancestors/prerequisites. У ancestors вне выбранного
+поддерева состав остальных детей не проверяется, поэтому счётчик не выводится.
+Sibling order — ID; цвета Epic назначаются по отсортированным ID прочитанного
+inventory, с повтором палитры после шести. ▶ означает Beads `in_progress`,
+не фактическую активность агента.
+
+Нужны только Git и доступная Beads-база текущего проекта. Canonical checkout и
+проверка `bd where` те же, что у scheduler; ambient DB redirects отвергаются.
+Не нужны OpenCode/API, установленный пакет MIS, docs/product/spec, remote,
+scheduler YAML и свободный scheduler lock. Статус можно читать при работающем
+диспетчере. Все обращения к Beads — `--readonly`; нет init/claim/update,
+Git/Dolt fetch/pull/push, session create или рекомендаций следующего действия.
+Существующие `/mis-status` и скилл остаются доступны без установленного бинарника.
+
+Неизвестные типы/статусы печатаются явно. Некорректные parent-связи вынесены в
+«⚠️ Связи не подтверждены»; недоступные endpoints, циклы и ошибки чтения сообщаются
+как диагностика. Ошибка или несогласованность → exit 1, не ложный пустой план;
+если возможно, перед ошибкой печатается доступная часть. Успех → exit 0.
+Несколько CLI-чтений не являются транзакционным снимком: замеченные расхождения
+связей отмечаются, но отсутствие гонок с concurrent writers не гарантируется.
+
+Проверка реального CLI без установки бинарника и без моделей:
+
+```sh
+go build -o /tmp/opencode/mis-dispatcher ./cmd/mis-dispatcher
+python3 -B tests/status_cli_smoke.py /tmp/opencode/mis-dispatcher
+```
+
+Smoke создаёт только disposable Git/Beads fixture, проверяет дерево, ID scope,
+linked worktree и неизменность issue inventory/Git HEAD/Dolt status. Явный `TMPDIR`
+поддерживается Go CLI transport и smoke при ограничениях системного temp.
 
 ## Конфигурация
 
