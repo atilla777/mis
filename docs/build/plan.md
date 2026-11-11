@@ -6,6 +6,43 @@ description: Единственный простой список прогрес
 ---
 # Простой план создания MIS
 
+## Назначенная работа — CLI status (2026-11-11)
+
+**Прогресс:** `completed`. По запросу пользователя: `mis-dispatcher --status [ID]`
+печатает разовый read-only план без LLM, scheduler, OpenCode API, конфигурации или
+блокировки dispatcher. Без аргументов старый scheduler сохраняется. Дерево в
+формате существующего status-скилла; скилл остаётся, рекомендация следующего
+действия в CLI не переносится. Никакой установки бинарника в рабочий HOME или
+запуска моделей в пользовательских проектах.
+
+**Результат:** CLI flag/help, отдельное чтение unlimited all-status Beads или
+точного поддерева, native parent/blocks, закрытые ancestors и счётчики прямых
+детей, внешние prerequisites, неизвестные поля и диагностика ошибок/циклов.
+При неполноте/несогласованности exit 1 и доступная часть отчёта; ложного пустого
+плана нет. Root detection отделён от требований execution; status не берёт lock.
+Transport теперь уважает явный `TMPDIR`; обычный temp default сохранён.
+README/product contract актуализированы; package skills/commands не менялись.
+**Проверки:** Go 1.25.4 build, `go test -race -count=1 ./...`, `go vet ./...`,
+whitespace — PASS. Status unit tests покрывают scope, counters, closed context,
+unknown fields, explicit/native edges, invalid JSON/null/duplicates, missing ID/
+parents/blockers, parent/blocks cycles, redirects и held scheduler lock.
+`tests/status_cli_smoke.py` — PASS на реальном bd 1.3.1/embedded Dolt:
+`/home/aleksei/.cache/mis-status-checks/mis-status-46zdscf4`; проверены дерево,
+ID scope, external blockers, invalid scheduler YAML/arguments, linked worktree,
+неизменность issue inventory/Git HEAD/Dolt status. OpenCode/model не вызывались.
+**Ограничения проверки:** системный `/tmp` возвращает disk quota exceeded;
+Go/новый smoke проверены с явным TMPDIR в пользовательском cache, без очистки
+чужих данных. 23 старых Python unit tests установки не смогли подготовить fixtures
+из-за жёсткого `/tmp/opencode` (игнорируют TMPDIR); их PASS не заявляется.
+Нет independent-agent review или гарантии транзакционного снимка concurrent DB.
+Глобально установленный бинарник и пользовательские проекты не обновлялись.
+**Коммит реализации:** [`098af75`](https://github.com/atilla777/mis/commit/098af75f3ea07fcf431e244f62cd1919a83114b0)
+— код, тесты и пользовательская документация. Обычный push в origin/main выполнен;
+отдельный `git ls-remote` подтвердил полный SHA
+`098af75f3ea07fcf431e244f62cd1919a83114b0`. Эта отметка — отдельный docs-коммит.
+**Следующий шаг:** новая работа не назначена; обновление глобального бинарника —
+отдельная явная установка по существующей процедуре pinned bootstrap.
+
 ## Назначенная работа — MIS Dispatcher (2026-11-11)
 
 **Прогресс:** `completed`. Границы — Go CLI для текущего проекта, без реальных
