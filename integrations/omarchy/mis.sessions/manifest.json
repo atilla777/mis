@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "mis.sessions",
+  "name": "MIS Sessions",
+  "version": "0.1.0",
+  "author": "MIS",
+  "description": "Dispatcher sessions grouped by project, with four native windows",
+  "kinds": ["bar-widget"],
+  "entryPoints": {"barWidget": "BarWidget.qml"},
+  "barWidget": {
+    "displayName": "MIS Sessions",
+    "description": "Existing dispatcher sessions; no task submission",
+    "category": "Development",
+    "allowMultiple": false
+  }
+}

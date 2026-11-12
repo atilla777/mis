@@ -6,6 +6,38 @@ description: Единственный простой список прогрес
 ---
 # Простой план создания MIS
 
+## Назначенная работа — Omarchy Sessions (2026-11-12)
+
+**Прогресс:** `completed` (исходники и проверки; без постоянной установки). По согласованному в разговоре интерфейсу: без Herdr,
+проекты автоматически, до четырёх обычных окон OpenCode, раскрывающийся список,
+замена выбранного слота, автоматическое скрытие подтверждённо завершённых задач.
+Отдельный необязательный Omarchy plugin, без изменений dispatcher и package flows.
+Результат: `integrations/omarchy/mis.sessions/` — QML popup, Python stdlib helper,
+Lua grid и инструкция отдельного подключения. Native API только GET, Beads только
+`--readonly`; root/child и точная reservation проверяются. Ошибки/пропавшая связь
+не означают completion: прежние окна сохраняются как stale. Last-focused slot
+заменяется внутри того же Kitty окна; helper завершает только свой дочерний TUI,
+не process group и не сервер. Владение окнами подтверждается initialClass/class
+и точным argv Kitty. Именованные `mis-<hash>` workspaces, штатные биндинги без изменений.
+**Проверки:** все 49 Python unit tests — PASS (26 новых, 23 существовавших),
+Go 1.25.4 `go test -race ./...`, `go vet ./...`, whitespace, Omarchy manifest validation — PASS.
+Четыре живых smoke без LLM — PASS на OpenCode 2.0.32, Hyprland 0.56.2, Kitty 0.48.2:
+TUI SIGTERM при продолжающейся server-side shell-команде; четыре dummy окна 2x2,
+fullscreen/restore и отсутствие launch focus stealing; реальная загрузка QML с
+компонентами Omarchy; четыре настоящих TUI и пятая disposable session с заменой
+выбранного слота, фокусом, сохранением всех server sessions и cleanup окон пустого
+проекта. Fixtures sessions удалены только после проверок, модели не вызывались.
+Readonly discovery также проверено на существующих dispatcher metadata; старая
+некорректная test reservation изолируется как предупреждение отдельного проекта.
+**Review:** саморевью; независимый агент не использовался.
+**Ограничения:** нет пилота при реальной генерации модели и проверки popup в
+пользовательском bar layout; QML smoke загрузил реальный компонент отдельно.
+Есть native GET→TUI create-if-missing race при concurrent session delete; описан.
+Полный session inventory постраничный, без latency SLA. Пользовательские конфиги,
+пакеты, бинарники и реальные задачи не менялись; временные Lua rules снимаются reload.
+**Следующий шаг:** по отдельному запросу подключить plugin в пользовательский
+Omarchy и проверить поведение на рабочем desktop. Это не установка через MIS flows.
+
 ## Назначенная работа — inherited dispatcher metadata (2026-11-12)
 
 **Прогресс:** `completed`. Исправление опубликовано, глобальный бинарник обновлён

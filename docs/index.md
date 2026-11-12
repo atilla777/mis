@@ -13,6 +13,7 @@ okf_version: "0.2"
 - [Запрос изменения (`mis-bug`)](product/bug-intake.md) — сбор сведений, исследование и подробный Bug для последующего run.
 - [Выполнение (`mis-run`)](product/execution.md) — автономная работа, worktree, проверки, публикация.
 - [MIS Dispatcher](product/dispatcher.md) — необязательная Go-утилита запуска ready-задач через `/mis-run` и просмотра статуса без LLM.
+- [MIS Sessions](product/sessions.md) — отдельный desktop-пульт Omarchy для существующих сессий диспетчера.
 - [Спецификации и знания](product/specifications.md) — `docs/product/`, `docs/spec/`, `docs/rules/`, моменты обновления.
 - [Пользовательские команды и отчёты](product/experience.md) — планирование, выполнение, статус и следующее действие.
 
