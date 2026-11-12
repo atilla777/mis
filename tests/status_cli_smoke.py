@@ -112,7 +112,24 @@ assert run(BINARY, "--status", cwd=linked / "nested").stdout == result.stdout
 assert bd("list", "--all", "--limit", "0", "--flat") == before
 assert run("git", "rev-parse", "HEAD").stdout == head
 assert run("bd", "--readonly", "dolt", "status", "--json").stdout == dolt_before
+# Exercise real multi-ID dep output across the 128-ID batch boundary, too.
+bulk = ROOT / "bulk.md"
+bulk.write_text(
+    "".join(
+        f"## Batch task {i:03d}\n\nDisposable status fixture.\n\n" for i in range(130)
+    )
+)
+run("bd", "--sandbox", "create", "--file", str(bulk))
+bulk_before = bd("list", "--all", "--limit", "0", "--flat")
+bulk_dolt = run("bd", "--readonly", "dolt", "status", "--json").stdout
+large = run(BINARY, "--status").stdout
+assert "закрыто 1/2 задач" in large and f"ждёт `{bug}`" in large, large
+for i in range(130):
+    assert large.count(f"Batch task {i:03d}") == 1, large
+assert bd("list", "--all", "--limit", "0", "--flat") == bulk_before
+assert run("git", "rev-parse", "HEAD").stdout == head
+assert run("bd", "--readonly", "dolt", "status", "--json").stdout == bulk_dolt
 print(result.stdout)
 print(
-    "PASS: real readonly status, scoped blockers, linked worktree, unchanged issues/Git/Dolt"
+    "PASS: real readonly status, scoped blockers, linked worktree, 134-issue batches, unchanged issues/Git/Dolt"
 )

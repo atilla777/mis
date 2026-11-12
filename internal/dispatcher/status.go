@@ -95,8 +95,15 @@ func (p *statusPlan) get(ctx context.Context, id string) error {
 	return p.add(rows[0])
 }
 
-// Native dep list has two supported shapes. Never infer membership from IDs.
-func (p *statusPlan) edges(ctx context.Context, id, kind string) ([]string, error) {
+// Bound argv size as well as the number of CLI startups. Multi-ID dep list
+// returns explicit source/target records; the single-ID form may return issues.
+const statusEdgeBatchSize = 128
+
+func (p *statusPlan) edges(ctx context.Context, ids []string, kind string) (map[string][]string, error) {
+	result := make(map[string][]string, len(ids))
+	for _, id := range ids {
+		result[id] = nil
+	}
 	var rows []struct {
 		ID             string `json:"id"`
 		DependencyType string `json:"dependency_type"`
@@ -104,27 +111,33 @@ func (p *statusPlan) edges(ctx context.Context, id, kind string) ([]string, erro
 		DependsOn      string `json:"depends_on_id"`
 		Type           string `json:"type"`
 	}
-	if err := p.read(ctx, &rows, "dep", "list", id, "--type", kind, "--direction=down"); err != nil {
+	args := append([]string{"dep", "list"}, ids...)
+	args = append(args, "--type", kind, "--direction=down")
+	if err := p.read(ctx, &rows, args...); err != nil {
 		return nil, err
 	}
-	var result []string
-	seen := map[string]bool{}
+	seen := map[string]map[string]bool{}
 	for _, edge := range rows {
-		target := ""
-		if edge.DependencyType == kind && edge.ID != "" {
-			target = edge.ID
-		} else if edge.Type == kind && edge.Issue == id {
-			target = edge.DependsOn
+		source, target := edge.Issue, edge.DependsOn
+		if len(ids) == 1 && edge.DependencyType == kind && edge.ID != "" {
+			source, target = ids[0], edge.ID
+		} else if edge.Type != kind {
+			return nil, fmt.Errorf("unknown %s edge shape", kind)
 		}
-		if target == "" {
-			return nil, fmt.Errorf("%s: unknown %s edge shape", id, kind)
+		if _, ok := result[source]; !ok || target == "" {
+			return nil, fmt.Errorf("unknown %s edge endpoints", kind)
 		}
-		if !seen[target] {
-			result = append(result, target)
-			seen[target] = true
+		if seen[source] == nil {
+			seen[source] = map[string]bool{}
+		}
+		if !seen[source][target] {
+			result[source] = append(result[source], target)
+			seen[source][target] = true
 		}
 	}
-	sort.Strings(result)
+	for _, targets := range result {
+		sort.Strings(targets)
+	}
 	return result, nil
 }
 
@@ -200,13 +213,17 @@ func (p *statusPlan) load(ctx context.Context, selected string) error {
 			break
 		}
 		sort.Strings(pending)
+		if len(pending) > statusEdgeBatchSize {
+			pending = pending[:statusEdgeBatchSize]
+		}
+		edges, edgeErr := p.edges(ctx, pending, "parent-child")
 		for _, id := range pending {
 			processed[id] = true
-			parents, err := p.edges(ctx, id, "parent-child")
-			if err != nil {
-				p.problem(id, err.Error())
+			if edgeErr != nil {
+				p.problem(id, edgeErr.Error())
 				continue
 			}
+			parents := edges[id]
 			p.parents[id] = parents
 			if expected, ok := expectedParents[id]; ok && (len(parents) != 1 || parents[0] != expected) {
 				p.problem(id, "состав детей расходится со связью родителя")
@@ -259,23 +276,32 @@ func (p *statusPlan) load(ctx context.Context, selected string) error {
 	sort.Strings(ids)
 	checkedBlocks := map[string]bool{}
 	for len(ids) > 0 {
-		id := ids[0]
-		ids = ids[1:]
-		if checkedBlocks[id] || p.rows[id].Status == "closed" {
+		batch := []string{}
+		for len(ids) > 0 && len(batch) < statusEdgeBatchSize {
+			id := ids[0]
+			ids = ids[1:]
+			if checkedBlocks[id] || p.rows[id].Status == "closed" {
+				continue
+			}
+			checkedBlocks[id] = true
+			batch = append(batch, id)
+		}
+		if len(batch) == 0 {
 			continue
 		}
-		checkedBlocks[id] = true
-		blocks, err := p.edges(ctx, id, "blocks")
-		if err != nil {
-			p.diagnostics = append(p.diagnostics, id+": "+err.Error())
-			continue
-		}
-		p.blocks[id] = blocks
-		for _, blocker := range blocks {
-			if err := p.get(ctx, blocker); err != nil {
-				p.diagnostics = append(p.diagnostics, id+": блокер "+blocker+" не проверен")
-			} else {
-				ids = append(ids, blocker)
+		edges, edgeErr := p.edges(ctx, batch, "blocks")
+		for _, id := range batch {
+			if edgeErr != nil {
+				p.diagnostics = append(p.diagnostics, id+": "+edgeErr.Error())
+				continue
+			}
+			p.blocks[id] = edges[id]
+			for _, blocker := range edges[id] {
+				if err := p.get(ctx, blocker); err != nil {
+					p.diagnostics = append(p.diagnostics, id+": блокер "+blocker+" не проверен")
+				} else {
+					ids = append(ids, blocker)
+				}
 			}
 		}
 	}

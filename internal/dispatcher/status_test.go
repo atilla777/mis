@@ -90,17 +90,24 @@ func (f *statusFixture) run(_ context.Context, name string, args ...string) ([]b
 		}
 		return nil, fmt.Errorf("missing %s", a[1])
 	case "dep":
-		kind, id := a[4], a[2]
-		if a[5] != "--direction=down" {
+		if len(a) < 6 || a[len(a)-3] != "--type" || a[len(a)-1] != "--direction=down" {
 			return nil, fmt.Errorf("wrong direction")
 		}
-		targets := f.parents[id]
-		if kind == "blocks" {
-			targets = f.blocks[id]
-		}
+		kind := a[len(a)-2]
+		ids := a[2 : len(a)-3]
 		rows := []map[string]string{}
-		for _, target := range targets {
-			rows = append(rows, map[string]string{"id": target, "dependency_type": kind})
+		for _, id := range ids {
+			targets := f.parents[id]
+			if kind == "blocks" {
+				targets = f.blocks[id]
+			}
+			for _, target := range targets {
+				if len(ids) == 1 {
+					rows = append(rows, map[string]string{"id": target, "dependency_type": kind})
+				} else {
+					rows = append(rows, map[string]string{"issue_id": id, "depends_on_id": target, "type": kind})
+				}
+			}
 		}
 		return json.Marshal(rows)
 	}
@@ -263,7 +270,7 @@ func TestStatusExplicitEdgesAndRedirect(t *testing.T) {
 	f.rows = []statusIssue{issue("a", "task", "open"), issue("b", "epic", "open")}
 	run := func(ctx context.Context, name string, args ...string) ([]byte, error) {
 		if name == "bd" && len(args) > 8 && args[4] == "dep" {
-			if args[6] == "a" && args[8] == "parent-child" {
+			if args[6] == "a" && args[len(args)-2] == "parent-child" {
 				return []byte(`[{"issue_id":"a","depends_on_id":"b","type":"parent-child"}]`), nil
 			}
 			return []byte("[]"), nil
@@ -277,6 +284,75 @@ func TestStatusExplicitEdgesAndRedirect(t *testing.T) {
 	t.Setenv("BEADS_DIR", "/elsewhere")
 	if err := ShowStatus(context.Background(), f.root, "", run, &out); err == nil {
 		t.Fatal("accepted redirected DB")
+	}
+}
+
+func TestStatusBatchedCalls(t *testing.T) {
+	for _, count := range []int{1, 128, 129, 500} {
+		t.Run(fmt.Sprint(count), func(t *testing.T) {
+			f := newStatusFixture(t)
+			f.rows = append(f.rows, issue("e", "epic", "open"))
+			for i := 0; i < count; i++ {
+				id := fmt.Sprintf("task-%04d", i)
+				status := "closed"
+				if i%10 == 0 {
+					status = "open"
+				}
+				f.rows = append(f.rows, issue(id, "task", status))
+				f.parents[id] = []string{"e"}
+				if i%10 == 0 && i > 0 {
+					f.blocks[id] = []string{"task-0000"}
+				}
+			}
+			text, err := f.show("")
+			if err != nil || !strings.Contains(text, fmt.Sprintf("закрыто %d/%d задач", count-(count+9)/10, count)) {
+				t.Fatal(text, err)
+			}
+			parentCalls, blockCalls := 0, 0
+			for _, call := range f.calls {
+				switch {
+				case strings.HasSuffix(call, "--type parent-child --direction=down"):
+					parentCalls++
+				case strings.HasSuffix(call, "--type blocks --direction=down"):
+					blockCalls++
+				}
+			}
+			if parentCalls != (count+1+127)/128 || blockCalls != 1 || len(f.calls) != 1+parentCalls+blockCalls {
+				t.Fatalf("per-issue CLI reads returned: %d parent, %d blocks, %d total", parentCalls, blockCalls, len(f.calls))
+			}
+		})
+	}
+}
+
+func TestStatusBatchEdgeValidation(t *testing.T) {
+	for _, raw := range []string{
+		`[{"id":"b","dependency_type":"parent-child"}]`,
+		`[{"issue_id":"foreign","depends_on_id":"b","type":"parent-child"}]`,
+		`[{"issue_id":"a","depends_on_id":"","type":"parent-child"}]`,
+		`[{"issue_id":"a","depends_on_id":"b","type":"blocks"}]`,
+	} {
+		f := newStatusFixture(t)
+		f.rows = []statusIssue{issue("a", "task", "open"), issue("b", "epic", "open")}
+		f.raw["dep"] = raw
+		text, err := f.show("")
+		if err == nil || !strings.Contains(text, "Связи не подтверждены") || strings.Contains(text, "закрыто 0/") {
+			t.Fatalf("accepted invalid batch %s: %s, %v", raw, text, err)
+		}
+	}
+}
+
+func TestStatusBatchFailureAndDuplicates(t *testing.T) {
+	f := newStatusFixture(t)
+	f.rows = []statusIssue{issue("a", "task", "open"), issue("b", "epic", "open")}
+	f.parents["a"] = []string{"b", "b"}
+	text, err := f.show("")
+	if err != nil || !strings.Contains(text, "закрыто 0/1 задач") {
+		t.Fatal(text, err)
+	}
+	f.fail["dep"] = "offline"
+	text, err = f.show("")
+	if err == nil || !strings.Contains(text, "offline") || strings.Contains(text, "Незавершённых работ нет") {
+		t.Fatal(text, err)
 	}
 }
 
@@ -311,5 +387,54 @@ func TestStatusExternalBlockCycle(t *testing.T) {
 	text, err := f.show("a")
 	if err == nil || !strings.Contains(text, "цикл блокировок") || strings.Contains(text, "- ○ `outside`") {
 		t.Fatal(text, err)
+	}
+}
+
+func TestStatusMultipleBlockBatches(t *testing.T) {
+	f := newStatusFixture(t)
+	for i := 0; i < 260; i++ {
+		id := fmt.Sprintf("task-%03d", i)
+		f.rows = append(f.rows, issue(id, "task", "open"))
+		if i > 0 {
+			f.blocks[id] = []string{"task-000"}
+		}
+	}
+	text, err := f.show("")
+	if err != nil || strings.Count(text, "ждёт `task-000`") != 259 {
+		t.Fatal(text, err)
+	}
+	if len(f.calls) != 7 { // inventory + three parent batches + three block batches
+		t.Fatal("unexpected call count", len(f.calls))
+	}
+}
+
+func TestStatusExternalBlockFrontier(t *testing.T) {
+	f := newStatusFixture(t)
+	f.rows = []statusIssue{issue("root", "epic", "open"), issue("child", "task", "open"), issue("x", "task", "open"), issue("y", "task", "open"), issue("z", "task", "closed")}
+	f.parents["child"] = []string{"root"}
+	f.blocks["child"] = []string{"x", "y"}
+	f.blocks["x"] = []string{"y", "z"}
+	f.blocks["y"] = []string{"x"}
+	text, err := f.show("root")
+	if err == nil || !strings.Contains(text, "цикл блокировок") || !strings.Contains(text, "ждёт `x` Title x, `y` Title y") || strings.Contains(text, "- ○ `x`") {
+		t.Fatal(text, err)
+	}
+}
+
+func TestStatusFailedBatchKeepsOtherBatches(t *testing.T) {
+	f := newStatusFixture(t)
+	for i := 0; i < 130; i++ {
+		f.rows = append(f.rows, issue(fmt.Sprintf("task-%03d", i), "task", "open"))
+	}
+	run := func(ctx context.Context, name string, args ...string) ([]byte, error) {
+		if name == "bd" && len(args) > 8 && args[4] == "dep" && args[6] == "task-000" && args[len(args)-2] == "parent-child" {
+			return nil, fmt.Errorf("batch unavailable")
+		}
+		return f.run(ctx, name, args...)
+	}
+	var out bytes.Buffer
+	err := ShowStatus(context.Background(), f.root, "", run, &out)
+	if err == nil || !strings.Contains(out.String(), "batch unavailable") || !strings.Contains(out.String(), "- ○ `task-129`") || !strings.Contains(out.String(), "Связи не подтверждены") {
+		t.Fatal(out.String(), err)
 	}
 }
