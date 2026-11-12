@@ -30,6 +30,7 @@ fullscreen/restore и отсутствие launch focus stealing; реальна
 Readonly discovery также проверено на существующих dispatcher metadata; старая
 некорректная test reservation изолируется как предупреждение отдельного проекта.
 **Review:** саморевью; независимый агент не использовался.
+**Коммит реализации:** `770c0c9` (`feat: add native Omarchy dispatcher session cockpit`).
 **Ограничения:** нет пилота при реальной генерации модели и проверки popup в
 пользовательском bar layout; QML smoke загрузил реальный компонент отдельно.
 Есть native GET→TUI create-if-missing race при concurrent session delete; описан.
