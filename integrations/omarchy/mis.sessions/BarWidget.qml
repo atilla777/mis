@@ -17,11 +17,46 @@ Ui.BarWidget {
   readonly property var projects: Object.values(snapshot.projects || {})
   readonly property var project: projects.find(p => p.path === selectedProject) || projects[0] || null
   readonly property var tasks: project ? project.tasks : []
-  readonly property int waiting: projects.reduce((n, p) => n + p.tasks.filter(t => ["WAITING_USER", "FAILED", "INCONSISTENT"].indexOf(t.state) >= 0).length, 0)
-  readonly property bool warning: error !== "" || Object.keys(snapshot.errors || {}).length > 0
+  readonly property int waiting: countState("WAITING_USER")
+  readonly property int running: countState("RUNNING")
+  readonly property int paused: countState("PAUSED")
+  readonly property int failed: countState("FAILED") + countState("INCONSISTENT")
+  readonly property bool warning: error !== "" || Object.keys(snapshot.errors || {}).length > 0 || projects.some(p => p.stale)
+  readonly property string indicatorText: "MIS"
+    + (waiting ? " ? " + waiting : "")
+    + (failed ? " ! " + failed : warning ? " !" : "")
+    + (running ? " ▶ " + running : "")
+    + (paused ? " Ⅱ " + paused : "")
+  readonly property color indicatorColor: waiting || failed || warning ? Color.urgent
+    : running ? Color.accent : root.bar ? root.bar.barForeground : Color.foreground
+  readonly property string indicatorTooltip: "MIS Sessions · проектов: " + projects.length
+    + " · работают: " + running + " · ждут ответа: " + waiting
+    + " · на паузе: " + paused + " · ошибки задач: " + failed
+    + (warning ? " · есть ошибки обновления; данные могут устареть" : "")
 
   implicitWidth: button.implicitWidth
   implicitHeight: button.implicitHeight
+
+  function projectCount(p, state) {
+    return p && !p.stale && !root.error ? p.tasks.filter(t => t.state === state).length : 0
+  }
+  function countState(state) {
+    return projects.reduce((n, p) => n + projectCount(p, state), 0)
+  }
+  function projectText(p) {
+    var questions = projectCount(p, "WAITING_USER")
+    return p.name + " · " + p.tasks.length + (questions ? " · ? " + questions : "") + (p.stale ? " !" : "")
+  }
+  function stateText(state) {
+    switch (state) {
+      case "WAITING_USER": return "? Ждёт вашего ответа или разрешения"
+      case "RUNNING": return "▶ Работает"
+      case "PAUSED": return "Ⅱ На паузе"
+      case "FAILED": return "! Ошибка сессии"
+      case "INCONSISTENT": return "! Состояние задачи и сессии не совпадает"
+      default: return state
+    }
+  }
 
   function open() { opened = true; refresh() }
   function close() { opened = false }
@@ -81,9 +116,9 @@ Ui.BarWidget {
     id: button
     anchors.fill: parent
     bar: root.bar
-    text: "MIS" + (root.waiting ? " !" + root.waiting : root.warning ? " !" : "")
-    tooltipText: "MIS Sessions · " + root.projects.length + " projects"
-    foreground: root.waiting || root.warning ? Color.urgent : root.bar ? root.bar.barForeground : Color.foreground
+    text: root.indicatorText
+    tooltipText: root.indicatorTooltip
+    foreground: root.indicatorColor
     onPressed: function(b) {
       if (b === Qt.MiddleButton) root.refresh()
       else root.toggle()
@@ -128,9 +163,17 @@ Ui.BarWidget {
         }
         Text {
           width: parent.width
+          visible: root.waiting > 0
+          text: "? Ждут вашего ответа: " + root.waiting + ". Выберите проект с меткой ? и откройте задачу."
+          color: Color.urgent
+          wrapMode: Text.Wrap
+        }
+        Text {
+          width: parent.width
           visible: root.warning || !root.projects.length
           text: root.error || (Object.keys(root.snapshot.errors || {}).length
             ? "Недоступные проекты: " + Object.keys(root.snapshot.errors).join(", ")
+            : root.warning ? "Данные проектов устарели; дождитесь обновления"
             : "Нет незавершённых задач диспетчера")
           textFormat: Text.PlainText
           color: root.warning ? Color.urgent : Color.foreground
@@ -157,9 +200,9 @@ Ui.BarWidget {
                 Text {
                   id: projectLabel
                   anchors.centerIn: parent
-                  text: modelData.name + " · " + modelData.tasks.length + (modelData.stale ? " !" : "")
+                  text: root.projectText(modelData)
                   textFormat: Text.PlainText
-                  color: Color.foreground
+                  color: root.projectCount(modelData, "WAITING_USER") ? Color.urgent : Color.foreground
                   font.pixelSize: Style.font.body
                 }
                 MouseArea {
@@ -204,8 +247,8 @@ Ui.BarWidget {
                 font.pixelSize: Style.font.body
               }
               Text {
-                text: modelData.state
-                color: modelData.state === "WAITING_USER" || modelData.state === "FAILED" ? Color.urgent : Color.foreground
+                text: root.project.stale || root.error ? "! Данные устарели · " + root.stateText(modelData.state) : root.stateText(modelData.state)
+                color: ["WAITING_USER", "FAILED", "INCONSISTENT"].indexOf(modelData.state) >= 0 ? Color.urgent : Color.foreground
                 font.pixelSize: Style.font.caption
               }
             }

@@ -104,6 +104,21 @@ class Snapshot(unittest.TestCase):
                 snap["projects"][root]["tasks"][0]["state"], "WAITING_USER"
             )
 
+    def test_pending_question_takes_priority_over_active_family(self):
+        with tempfile.TemporaryDirectory(dir="/tmp/opencode") as root:
+            s, t = fixture(root)
+            child = {**s, "id": "ses_child", "parentID": s["id"]}
+            snap = self.collect(
+                root,
+                {s["id"]: s, child["id"]: child},
+                [t],
+                active={s["id"]: {}, child["id"]: {}},
+                waits={child["id"]: True},
+            )
+            self.assertEqual(
+                snap["projects"][root]["tasks"][0]["state"], "WAITING_USER"
+            )
+
     def test_bad_test_record_does_not_hide_working_project(self):
         with tempfile.TemporaryDirectory(dir="/tmp/opencode") as root:
             s, t = fixture(root)
@@ -141,6 +156,20 @@ class Snapshot(unittest.TestCase):
 
 
 class Safety(unittest.TestCase):
+    def test_only_native_pending_requests_mean_waiting(self):
+        for kind in ("form", "permission"):
+            with self.subTest(kind=kind):
+
+                def api(path):
+                    return {
+                        "data": [{"id": "request"}] if path.endswith("/" + kind) else []
+                    }
+
+                with patch.object(m, "api", side_effect=api):
+                    self.assertTrue(m.pending("ses_root"))
+        with patch.object(m, "api", return_value={"data": []}):
+            self.assertFalse(m.pending("ses_root"))
+
     def test_invalid_pending_shape_is_not_empty_success(self):
         with (
             patch.object(m, "api", return_value={"data": {}}),
