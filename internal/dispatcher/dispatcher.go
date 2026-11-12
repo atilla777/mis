@@ -85,8 +85,35 @@ const (
 )
 
 func linked(s Session, r Reservation) bool {
+	return s.ID == r.Session && reservationMatches(s, r)
+}
+
+func reservationMatches(s Session, r Reservation) bool {
 	var other Reservation
-	return s.ID == r.Session && json.Unmarshal(s.Metadata[MetadataKey], &other) == nil && other.Version == r.Version && other.Project == r.Project && other.Task == r.Task && other.Session == r.Session
+	return json.Unmarshal(s.Metadata[MetadataKey], &other) == nil && other.Version == r.Version && other.Project == r.Project && other.Task == r.Task && other.Session == r.Session
+}
+
+// Children may inherit the root's reservation. Accept that metadata only when
+// native ancestry reaches the exact Beads-linked root, never merely by task ID.
+func linkedFamily(s Session, r Reservation, sessions map[string]Session) bool {
+	root, ok := sessions[r.Session]
+	if !ok || !linked(root, r) || !reservationMatches(s, r) {
+		return false
+	}
+	seen := make(map[string]bool)
+	for {
+		if s.ID == r.Session {
+			return true
+		}
+		if seen[s.ID] {
+			return false
+		}
+		seen[s.ID] = true
+		s, ok = sessions[s.Parent]
+		if !ok {
+			return false
+		}
+	}
 }
 
 func classify(t Task, r Reservation, sessions map[string]Session) (State, bool, error) {
@@ -208,7 +235,7 @@ func (d *Dispatcher) Cycle(ctx context.Context, cfg Config) (Counts, error) {
 		var r Reservation
 		if json.Unmarshal(s.Metadata[MetadataKey], &r) == nil && r.Project == d.Root {
 			stored, ok := reservations[r.Task]
-			if !ok || !linked(s, stored) {
+			if !ok || !linkedFamily(s, stored, sessions) {
 				d.warn(fmt.Errorf("orphan/conflicting dispatcher session %s: exact Beads link for %s missing", s.ID, r.Task))
 				consistent = false
 			}

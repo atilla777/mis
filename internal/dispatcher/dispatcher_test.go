@@ -319,6 +319,72 @@ func TestInconsistentAndOrphanInventory(t *testing.T) {
 	}
 }
 
+func TestInheritedDispatcherMetadata(t *testing.T) {
+	for _, mode := range []string{"child", "grandchild", "completed-child", "unrelated", "missing-parent", "cycle", "wrong-task", "wrong-root", "self-reservation", "missing-root", "root-mismatch"} {
+		t.Run(mode, func(t *testing.T) {
+			d, b, o := fixture(2)
+			_, err := d.Cycle(context.Background(), Config{time.Second, 1, 12})
+			if err != nil {
+				t.Fatal(err)
+			}
+			r, _ := b.tasks[0].Reservation()
+			// OpenCode children inherit the root's metadata, including its ID
+			// and the original reserved phase (Beads is already submitted).
+			root := o.sessions[r.Session]
+			root.Running = false
+			o.sessions[r.Session] = root
+			child := Session{ID: "ses_child", Parent: r.Session, Running: true, Metadata: root.Metadata}
+			inherited := *r
+			inherited.Phase = "reserved"
+			valid := mode == "child" || mode == "grandchild" || mode == "completed-child"
+			switch mode {
+			case "grandchild":
+				o.sessions["ses_middle"] = Session{ID: "ses_middle", Parent: r.Session}
+				child.Parent = "ses_middle"
+			case "completed-child":
+				child.Running = false
+				child.Outcome = "succeeded"
+			case "unrelated":
+				child.Parent = ""
+			case "missing-parent":
+				child.Parent = "ses_missing"
+			case "cycle":
+				child.Parent = "ses_middle"
+				o.sessions["ses_middle"] = Session{ID: "ses_middle", Parent: child.ID}
+			case "wrong-task":
+				inherited.Task = b.tasks[1].ID
+			case "wrong-root":
+				inherited.Session = "ses_other"
+			case "self-reservation":
+				inherited.Session = child.ID
+			case "missing-root":
+				delete(o.sessions, r.Session)
+			case "root-mismatch":
+				root.Metadata = nil
+				o.sessions[r.Session] = root
+			}
+			data, _ := json.Marshal(inherited)
+			child.Metadata = map[string]json.RawMessage{MetadataKey: data}
+			o.sessions[child.ID] = child
+			n, err := d.Cycle(context.Background(), defaults)
+			if valid {
+				if err != nil || n.Started != 1 || len(o.commands) != 2 {
+					t.Fatalf("valid descendant blocked launch: %+v, %v", n, err)
+				}
+				wantActive := 2 // One existing task family and one new launch.
+				if mode == "completed-child" {
+					wantActive = 1
+				}
+				if n.Active != wantActive || n.Open != 2 {
+					t.Fatalf("descendant counted incorrectly: %+v", n)
+				}
+			} else if err == nil || n.Started != 0 || len(o.commands) != 1 {
+				t.Fatalf("conflicting descendant allowed launch: %+v, %v", n, err)
+			}
+		})
+	}
+}
+
 func TestTemporaryBackendFailure(t *testing.T) {
 	d, b, o := fixture(1)
 	b.err = errors.New("bd unavailable")
