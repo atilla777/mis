@@ -8,9 +8,10 @@ description: Единственный простой список прогрес
 
 ## Назначенная работа — dispatcher reservation identity (2026-11-24)
 
-**Прогресс:** `implemented` в ветке `fix/dispatcher-reservation-identity` (base
-`ff68604`). Independent advanced review выявил 2 medium required text fixes;
-R1/R2 исправлены в той же worktree, re-review, commit и push не выполнялись.
+**Прогресс:** `completed` в ветке `fix/dispatcher-reservation-identity` (base
+`ff68604`). Реализация поручена `standard`; отдельный read-only `advanced`
+выявил 2 medium required text fixes. R1/R2 исправлены автором, независимый
+re-review полного четырёхфайлового снимка — PASS, обязательных замечаний нет.
 Устранена неоднозначность matching `metadata.mis_dispatcher` в
 `skills/mis-flow-run/SKILL.md` и `docs/product/dispatcher.md`: identity — равенство
 `version`/`project`/`task`/`session`, причём `session` равен текущему native
@@ -34,11 +35,17 @@ independent review независимо подтвердил full Go race/vet/bu
 После R1/R2 менялся только текст: runtime/tests bytes не менялись, полный прогон
 не повторялся; затронутый текст и `git diff --check` проверены.
 **Ограничения:** изменения только docs/тесты; live metadata, потребители,
-установленные skills, Snyrk и чужие worktree не затрагивались. Re-review R1/R2,
-commit/push и fresh-model e2e не выполнялись; поведение доказано unit-регрессиями.
-**Следующий шаг:** independent advanced re-review исправлений R1/R2; после PASS
-родительская сессия выполняет commit/push. Новая реализационная сессия не
-запускалась.
+установленные skills, Snyrk и чужие worktree не затрагивались. Fresh-model e2e
+не выполнялся; runtime покрыт unit-регрессиями, поведение агента текстом не доказано.
+**Review:** отдельный advanced `ses_df24b1f5cffelj2qFuzy505Kg8`; R1/R2 resolved.
+Полный снимок реализации (sorted path + NUL + bytes + NUL четырёх изменённых
+файлов): SHA256 `dcf724f8c506aa779cbe8f2e6b39f85629071ffcfb787c94e506dade0a0d74f9`.
+Эта последующая запись меняет только progress в плане.
+**Публикация:** коммит реализации `3c2ac41d7ee94e1bc692268e75d6da745ee8ec16`,
+обычный non-force push в `origin/main`; отдельный `git ls-remote` подтвердил SHA.
+**Следующий шаг:** для применения в Snyrk нужно штатное обновление установленного
+MIS по опубликованной ревизии, затем новая сессия с обновлённым skill. Обновление
+потребителя не выполнялось. Новая реализационная работа не назначена.
 
 ## Назначенная работа — индикаторы MIS Sessions (2026-11-12)
 
