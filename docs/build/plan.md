@@ -6,6 +6,40 @@ description: Единственный простой список прогрес
 ---
 # Простой план создания MIS
 
+## Назначенная работа — dispatcher reservation identity (2026-11-24)
+
+**Прогресс:** `implemented` в ветке `fix/dispatcher-reservation-identity` (base
+`ff68604`). Independent advanced review выявил 2 medium required text fixes;
+R1/R2 исправлены в той же worktree, re-review, commit и push не выполнялись.
+Устранена неоднозначность matching `metadata.mis_dispatcher` в
+`skills/mis-flow-run/SKILL.md` и `docs/product/dispatcher.md`: identity — равенство
+`version`/`project`/`task`/`session`, причём `session` равен текущему native
+`OPENCODE_SESSION_ID`; сравниваются поля, не JSON целиком. R1: равенство metadata
+не заменяет ground truth — `task` сверяется с фактическим ID точного Bead,
+`project` — с canonical root фактического проекта (первый checkout, не Git
+common-dir), отдельно проверяется canonical Git common-dir; `version=1` и native
+session check сохранены. `phase` — этап отправки, не identity: штатная пара Beads
+`submitted` / session `reserved` допустима. R2: `submitted` фиксирует
+намерение/этап перед отправкой (запись до Command) и не доказывает ни попытку API,
+ни delivery, поскольку crash возможен до вызова. Зафиксирован запрет выравнивать
+metadata, снимать reservation, создавать другую сессию или повторять command из-за
+этого расхождения. Ownership/requirements/dependencies проверки сохранены. Runtime
+не менялся; строгая phase-sensitive проверка reservation непосредственно перед
+первоначальным submit не ослаблена.
+**Проверки:** новые Go regressions `TestSubmittedBeadsReservedSessionIdentity` и
+`TestReservationIdentityMismatchRejected` (version/project/task/session в Beads и
+metadata, фактический Session.ID) — PASS; `go test -race -count=1 ./...`,
+`go vet ./...`, `gofmt -l`, build, `git diff --check`, 51 Python tests — PASS;
+independent review независимо подтвердил full Go race/vet/build и 51 Python PASS.
+После R1/R2 менялся только текст: runtime/tests bytes не менялись, полный прогон
+не повторялся; затронутый текст и `git diff --check` проверены.
+**Ограничения:** изменения только docs/тесты; live metadata, потребители,
+установленные skills, Snyrk и чужие worktree не затрагивались. Re-review R1/R2,
+commit/push и fresh-model e2e не выполнялись; поведение доказано unit-регрессиями.
+**Следующий шаг:** independent advanced re-review исправлений R1/R2; после PASS
+родительская сессия выполняет commit/push. Новая реализационная сессия не
+запускалась.
+
 ## Назначенная работа — индикаторы MIS Sessions (2026-11-12)
 
 **Прогресс:** `completed`. По запросу пользователя bar показывает `▶ N` акцентным

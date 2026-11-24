@@ -30,12 +30,23 @@ Native Bug может быть дефектом либо явно приняты
     другого writer. Отсутствующий root/правила/существенные права — точный blocker.
    **MIS dispatcher reservation v1:** перед выбором/claim прочитай metadata
    `mis_dispatcher` точного Bead (bd сохраняет здесь JSON как строку). Если ключ
-   присутствует, нужны version=1, точные task/project и session, совпадающий с
-   **текущим** OpenCode Session ID; подтверди matching `metadata.mis_dispatcher`
-   этой сессии через API и canonical Git common-dir проекта. Чужая, повреждённая
-   или неоднозначная связь — остановка без claim/записи. Не убирай резервирование.
-   Текущий Session ID можно получить из native `OPENCODE_SESSION_ID` в shell;
-   если он отсутствует, не угадывай его по заголовку/возрасту сессии.
+   присутствует, identity связи — равенство `version`/`project`/`task`/`session`
+   в Beads и в metadata сессии (`version` должен быть 1), где `session` равен
+   **текущему** native `OPENCODE_SESSION_ID`; сравнивай эти четыре поля, не JSON
+   целиком. Одного равенства metadata недостаточно: `task` должен совпадать с
+   фактическим ID точного Bead, `project` — с canonical root фактического проекта
+   (первый checkout native `git worktree list`, подготовленный корень MIS-проекта;
+   это не Git common-dir), и отдельно проверь canonical Git common-dir проекта.
+   `phase` — этап отправки, не часть identity: штатная пара `phase=submitted` в
+   Beads и `phase=reserved` в metadata основной сессии не конфликт. `submitted`
+   фиксирует намерение/этап перед отправкой (запись до Command) и не доказывает ни
+   попытку API, ни delivery: crash может произойти до вызова. Подтверди matching
+   `metadata.mis_dispatcher` этой сессии через API. Чужая, повреждённая или
+   неоднозначная связь — остановка без claim/записи. Не выравнивай metadata, не
+   снимай reservation, не создавай другую сессию и не повторяй command из-за
+   расхождения `phase`. Не убирай резервирование. Текущий Session ID можно получить
+   из native `OPENCODE_SESSION_ID` в shell; если он отсутствует, не угадывай его по
+   заголовку/возрасту сессии.
    Dispatcher только резервирует и отправляет `/mis-run`; единственный atomic
    `bd update --claim` остаётся ниже в этом workflow, после проверки требований.
    В ручной выборке без ID исключай все зарезервированные записи; для продолжения

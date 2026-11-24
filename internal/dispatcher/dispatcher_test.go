@@ -319,6 +319,107 @@ func TestInconsistentAndOrphanInventory(t *testing.T) {
 	}
 }
 
+func sessionReservation(t *testing.T, s Session) Reservation {
+	t.Helper()
+	var r Reservation
+	if err := json.Unmarshal(s.Metadata[MetadataKey], &r); err != nil {
+		t.Fatal(err)
+	}
+	return r
+}
+
+func setReservationField(r *Reservation, field string) {
+	switch field {
+	case "version":
+		r.Version = 2
+	case "project":
+		r.Project = "/other"
+	case "task":
+		r.Task = "test-01"
+	case "session":
+		r.Session = "ses_other"
+	default:
+		panic("unknown reservation field " + field)
+	}
+}
+
+// A normal launch leaves Beads at phase=submitted while the root session keeps
+// the create-time reserved phase. Identity is the four linked fields, not JSON.
+func TestSubmittedBeadsReservedSessionIdentity(t *testing.T) {
+	d, b, o := fixture(1)
+	if _, err := d.Cycle(context.Background(), defaults); err != nil {
+		t.Fatal(err)
+	}
+	r, err := b.tasks[0].Reservation()
+	if err != nil || r.Phase != "submitted" {
+		t.Fatalf("Beads reservation: %+v %v", r, err)
+	}
+	s := sessionReservation(t, o.sessions[r.Session])
+	if s.Phase != "reserved" || s.Version != r.Version || s.Project != r.Project || s.Task != r.Task || s.Session != r.Session {
+		t.Fatalf("unexpected session metadata during normal launch: %+v", s)
+	}
+	n, err := d.Cycle(context.Background(), defaults)
+	if err != nil || n.Started != 0 || len(o.commands) != 1 || len(o.created) != 1 {
+		t.Fatalf("false conflict or resend: %+v %v commands=%v created=%v", n, err, o.commands, o.created)
+	}
+	if got, _ := b.tasks[0].Reservation(); got.Phase != "submitted" {
+		t.Fatalf("Beads phase changed: %+v", got)
+	}
+	if got := sessionReservation(t, o.sessions[r.Session]); got.Phase != "reserved" {
+		t.Fatalf("session phase changed: %+v", got)
+	}
+}
+
+func TestReservationIdentityMismatchRejected(t *testing.T) {
+	cases := []struct{ name, side, field string }{
+		{"beads-version", "beads", "version"},
+		{"beads-project", "beads", "project"},
+		{"beads-task", "beads", "task"},
+		{"beads-session", "beads", "session"},
+		{"session-version", "session", "version"},
+		{"session-project", "session", "project"},
+		{"session-task", "session", "task"},
+		{"session-session", "session", "session"},
+		{"actual-session-id", "actual-id", ""},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			d, b, o := fixture(2)
+			if _, err := d.Cycle(context.Background(), Config{time.Second, 1, 12}); err != nil {
+				t.Fatal(err)
+			}
+			r, err := b.tasks[0].Reservation()
+			if err != nil {
+				t.Fatal(err)
+			}
+			switch tc.side {
+			case "beads":
+				bad := *r
+				setReservationField(&bad, tc.field)
+				data, _ := json.Marshal(bad)
+				text, _ := json.Marshal(string(data))
+				b.tasks[0].Metadata[MetadataKey] = text
+			case "session":
+				s := o.sessions[r.Session]
+				bad := *r
+				bad.Phase = "reserved"
+				setReservationField(&bad, tc.field)
+				data, _ := json.Marshal(bad)
+				s.Metadata[MetadataKey] = data
+				o.sessions[r.Session] = s
+			case "actual-id":
+				s := o.sessions[r.Session]
+				s.ID = "ses_actual_other"
+				o.sessions[r.Session] = s
+			}
+			n, err := d.Cycle(context.Background(), defaults)
+			if err == nil || n.Started != 0 || len(o.commands) != 1 || len(o.created) != 1 || len(o.sessions) != 1 {
+				t.Fatalf("mismatch accepted: %+v %v commands=%v created=%v sessions=%d", n, err, o.commands, o.created, len(o.sessions))
+			}
+		})
+	}
+}
+
 func TestInheritedDispatcherMetadata(t *testing.T) {
 	for _, mode := range []string{"child", "grandchild", "completed-child", "unrelated", "missing-parent", "cycle", "wrong-task", "wrong-root", "self-reservation", "missing-root", "root-mismatch"} {
 		t.Run(mode, func(t *testing.T) {
